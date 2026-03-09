@@ -23,13 +23,15 @@ The files are stored under `claude/.claude/` rather than directly at the repo ro
 
 ## Installing
 
-These files are meant to live at `~/.claude/`. The simplest approach is a symlink:
+These files are meant to live at `~/.claude/`. The repo uses [GNU Stow](https://www.gnu.org/software/stow/) to symlink the `claude/` package into your home directory:
 
 ```bash
-ln -s /path/to/this/repo/claude/.claude ~/.claude
+./install.sh
 ```
 
-Or copy the files manually if you prefer not to symlink.
+This runs `stow -R claude`, which creates symlinks from `~/.claude/` pointing into the repo. Requires `stow` (`brew install stow`).
+
+Alternatively, copy the files manually if you prefer not to symlink.
 
 **Before using on a new machine**, check `settings.json` for local absolute paths and update them:
 
@@ -67,7 +69,17 @@ Ten specialised subagent reviewers, named after characters from Terry Pratchett'
 | `watch-adorabelle` | UX/UI design, interface clarity, component design, accessibility |
 | `watch-nobby` | PR/MR diff analysis — reads the actual diff, categorises changes, summons the right council agents |
 
-Three agents hold domain veto (Angua, Vimes, Granny) in that priority order. The full charter, including conflict resolution rules and the promotion path from Plan Mode to implementation, is in `CLAUDE.md`.
+### Veto authority
+
+Three agents hold domain veto. When their domains overlap, the following priority order resolves conflicts without escalation:
+
+| Priority | Agent | Veto scope |
+|----------|-------|------------|
+| 1 | `watch-angua` | Security concerns override architectural and data concerns when the overlap involves credential exposure, auth bypass, or supply chain risk |
+| 2 | `watch-vimes` | Data integrity concerns override architectural concerns when the overlap involves irreversible data operations, migration safety, or schema correctness under live traffic |
+| 3 | `watch-granny` | Architecture concerns are authoritative in all other design and structure disputes |
+
+Veto is deterministic, not a debate. The veto-holder states their ruling and the reason in one sentence. The overruled agent may file a **minority report** (what they'd do differently and why, in two sentences), which travels with the plan for the user to review. The full charter, including conflict resolution rules and the promotion path from Plan Mode to implementation, is in `CLAUDE.md`.
 
 ---
 
