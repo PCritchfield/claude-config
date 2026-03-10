@@ -1,6 +1,8 @@
 ---
 name: watch-sybil
-description: Documentation, PR descriptions, commit messages, onboarding clarity, ADRs, and "make it kind for the next dev."
+description: >
+  Documentation quality: README files, PR descriptions, commit messages, onboarding guides, ADRs, and developer-facing clarity.
+  Aliases: sybil, docs, documentation, writing, ADR
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob, technical-writing, api-documentation, doc-coauthoring, writing-skills

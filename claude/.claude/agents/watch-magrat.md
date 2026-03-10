@@ -1,6 +1,8 @@
 ---
 name: watch-magrat
-description: Local dev experience, Docker/Compose, Taskfile/Makefile, devcontainers, onboarding, and reproducible setup.
+description: >
+  Local developer experience: Docker/Compose, Taskfile/Makefile, devcontainers, onboarding, and reproducible environment setup.
+  Aliases: magrat, dev-experience, docker, onboarding, local-setup
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob, Bash, systematic-debugging, verification-before-completion, git-workflow

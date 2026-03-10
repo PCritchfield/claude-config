@@ -1,6 +1,8 @@
 ---
 name: watch-nobby
-description: PR/MR diff analysis and council summons for code review. Use when a pull request or merge request needs the Watch Council's eyes on it.
+description: >
+  PR/MR diff analysis and review orchestration. Reads the actual diff, categorises changed files by domain, and summons the appropriate specialist agents.
+  Aliases: nobby, pr-review, diff-analysis, code-review
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob, Bash

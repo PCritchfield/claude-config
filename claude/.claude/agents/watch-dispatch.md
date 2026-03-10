@@ -1,6 +1,8 @@
 ---
 name: watch-dispatch
-description: Routes a request to the right Watch member(s). Use when you want the council to choose who should handle each part, while keeping everything in strict Plan Mode.
+description: >
+  Request routing and orchestration. Analyses incoming tasks, identifies required domains, and assigns the right specialist agents.
+  Aliases: dispatch, routing, orchestration, triage
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob

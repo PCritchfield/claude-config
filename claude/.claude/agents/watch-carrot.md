@@ -1,6 +1,8 @@
 ---
 name: watch-granny
-description: Senior architecture, design reviews, and data model critique. Use for long-term maintainability, dependency discipline, naming, and "is this a good idea?" criticism.
+description: >
+  General-purpose coding, test design, safe refactors, and structured code review. Default agent for implementation tasks.
+  Aliases: carrot, coding, tests, implementation, pairing
 model: opus
 permissionMode: plan
 tools: Read, Grep, Glob, architecture-patterns, api-design-principles, systematic-debugging

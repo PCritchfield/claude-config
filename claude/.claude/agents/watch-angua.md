@@ -1,6 +1,8 @@
 ---
 name: watch-angua
-description: Security review. Use for secrets exposure, authn/authz, hardening configs, dependency/CVE hygiene, and threat modeling.
+description: >
+  Security review covering secrets exposure, authentication/authorization, configuration hardening, dependency and CVE hygiene, and threat modeling. Holds veto.
+  Aliases: angua, security, auth, secrets, CVE
 model: opus
 permissionMode: plan
 tools: Read, Grep, Glob, security-best-practices, better-auth-best-practices

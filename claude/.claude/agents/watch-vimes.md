@@ -1,6 +1,8 @@
 ---
 name: watch-vimes
-description: Database safety, schema migrations, query review, transaction integrity, ORM hygiene, seed data, and data integrity concerns.
+description: >
+  Database safety: schema migrations, query review, transaction integrity, ORM hygiene, seed data, and data integrity enforcement. Holds veto.
+  Aliases: vimes, database, migrations, schema, data-integrity
 model: opus
 permissionMode: plan
 tools: Read, Grep, Glob, database-schema-design, supabase-postgres-best-practices, postgresql-table-design

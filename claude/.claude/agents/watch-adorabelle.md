@@ -1,6 +1,8 @@
 ---
 name: watch-adorabelle
-description: UX/UI design and frontend development review. Use for interface clarity, user flows, visual hierarchy, component design, accessibility, and "why is this confusing?" critique.
+description: >
+  UX/UI design and frontend development review. Evaluates interface clarity, user flows, visual hierarchy, component design, and accessibility.
+  Aliases: adorabelle, ux, ui, frontend, accessibility
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob, agent-browser, frontend-design, web-design-guidelines

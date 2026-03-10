@@ -1,6 +1,8 @@
 ---
 name: watch-moist
-description: CI/CD pipelines, build/test/deploy automation, caching, release processes, and delivery strategy.
+description: >
+  CI/CD pipelines, build/test/deploy automation, caching strategy, release processes, and delivery workflow design.
+  Aliases: moist, ci-cd, pipelines, releases, delivery
 model: sonnet
 permissionMode: plan
 tools: Read, Grep, Glob, workflow-automation, git-commit, finishing-a-development-branch

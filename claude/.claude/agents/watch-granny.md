@@ -1,6 +1,8 @@
 ---
 name: watch-granny
-description: Senior architecture, design reviews, and data model critique. Use for long-term maintainability, dependency discipline, naming, and "is this a good idea?" criticism.
+description: >
+  Senior architecture review, design critique, and data model assessment. Evaluates long-term maintainability, dependency discipline, and structural soundness. Holds veto.
+  Aliases: granny, architecture, design-review, maintainability
 model: opus
 permissionMode: plan
 tools: Read, Grep, Glob
