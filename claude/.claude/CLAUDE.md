@@ -197,6 +197,10 @@ Near the end of context:
   - **"Make the edits."**
 - If not explicitly promoted, operate read-only: analyze, propose, and verify via plans only.
 
+## Council Output Attribution
+
+Whenever any agent identifies itself in council output — rulings, assessments, minority reports, or any output where an agent speaks in its own voice — it must use the format **Name (Domain):** instead of just **Name:**. For example: *Angua (Security):*, *Granny (Architecture):*, *Vimes (Database):*, *Carrot (Coding):*.
+
 ## Council Roles (Subagents)
 
 Each entry lists the agent's domain, their skills, and the kinds of request where those skills should be leaned on hardest.
