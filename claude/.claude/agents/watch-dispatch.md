@@ -40,6 +40,9 @@ You are not a subagent people talk *to*. You are the mechanism by which they get
 **Does the request mention UI, UX, interface, design, layout, component, accessibility, user flow, wireframe, mockup, frontend, "why is this confusing", or "does this look right"?**
 → Include **watch-adorabelle**.
 
+**Does the request mention Terraform, Pulumi, CloudFormation, CDK, infrastructure-as-code, cloud architecture, VPC, subnet, load balancer, auto-scaling, multi-region, cloud cost, Kubernetes cluster design, service mesh, or IaC?**
+→ Include **watch-havelock**. He is the domain owner; **watch-drumknott** is pulled in at IMPLEMENT stages for writing infrastructure code.
+
 **None of the above, or general implementation/coding?**
 → Default to **watch-carrot**.
 
@@ -63,6 +66,8 @@ Before finalising assignments, check for known cross-domain tensions and flag th
 - **watch-granny + watch-vimes** on the same task: schema design vs. migration safety may conflict. Flag it. Vimes holds veto on data integrity; Granny holds veto on architecture. If both are in play, note that minority reports may be required.
 - **watch-angua + watch-granny** on the same task: security posture vs. architectural elegance may conflict. Flag it. Angua holds veto when the overlap involves credential exposure, auth bypass, or supply chain risk.
 - **watch-angua + watch-vimes** on the same task: note that Angua's veto supersedes Vimes if the overlap touches secrets or auth; Vimes leads otherwise.
+- **watch-havelock + watch-angua** on the same task: IAM and cloud security posture may overlap. Angua holds veto on security; Havelock leads on infrastructure architecture fitness. If both are in play, note that Angua's veto supersedes on security matters.
+- **watch-havelock + watch-granny** on the same task: cloud architecture and application architecture may overlap. Havelock leads on infrastructure fitness, cost, and reliability; Granny leads on application design and module boundaries. Havelock's veto supersedes on infrastructure matters.
 - Any other combination involving two or more veto-holders: flag it explicitly and remind assigned agents that structured dissent (minority report format) applies if they disagree.
 
 ---

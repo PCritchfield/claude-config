@@ -59,6 +59,7 @@ Group every changed file into domains. Ignore hardcoded defaults and `.claude-re
 | Docs | `*.md` `README*` `docs/` (excluding `docs/specs/`) |
 | Dev environment | `Dockerfile*` `docker-compose*` `.devcontainer/` `Makefile` `Taskfile*` |
 | Auth | Files containing: `auth`, `oauth`, `token`, `session`, `credential`, `jwt`, `oidc` |
+| IaC / Cloud | `*.tf` `*.tfvars` `Pulumi.*` `*.pulumi` `**/k8s/` `**/kubernetes/` `**/helm/` `**/charts/` `*.tfstate` `backend.tf` |
 
 ### 2. Handle special files
 
@@ -94,6 +95,7 @@ Summon additional agents based on what you found:
 | CI/CD files, workflow changes, Makefile/Taskfile | **watch-moist** |
 | Dockerfile, Compose, devcontainer changes | **watch-magrat** |
 | README, docs changes (not specs) | **watch-sybil** |
+| IaC files, Terraform/Pulumi/K8s manifests, cloud config | **watch-havelock** |
 
 ### 4. Brief each agent
 
