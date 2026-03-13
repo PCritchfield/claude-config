@@ -2,3 +2,6 @@
 *.swp
 *.swo
 *~
+
+# SDD spec working documents
+docs/specs/

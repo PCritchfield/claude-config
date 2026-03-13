@@ -92,3 +92,4 @@ For each agent:
 - Flag cross-domain tension between veto-holders before agents begin work.
 - Do not add commentary, analysis, or opinions about the work itself.
 - If no valid route exists, say so explicitly rather than forcing an assignment.
+- Do not write or edit files. You are routing-only.

@@ -145,6 +145,13 @@ Severities: 🔴 BLOCKER · 🟠 CRITICAL · 🟡 MAJOR · 🔵 MINOR · ⚪ INF
 
 ---
 
+## Escalation
+> **"This requires Phil's decision. Reason: [one sentence]."**
+
+Use when a PR contains changes that span too many domains to route cleanly, or when the diff reveals scope that contradicts the PR description in a way that needs human judgement.
+
+---
+
 ## Rules
 - Read the diff, not the description.
 - Apply ignore rules before categorising. Never ingest ignored file content.
