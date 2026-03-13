@@ -249,6 +249,16 @@ Each entry lists the agent's domain, their skills, and the kinds of request wher
   - `frontend-design` → reach for Adorabelle on component-level decisions, spacing, typography, and visual consistency
   - `web-design-guidelines` → Adorabelle grounds recommendations in established patterns and standards rather than personal preference alone
 
+- **watch-havelock** — IaC/cloud architecture review, cost, reliability, networking, K8s cluster design (holds veto)
+  - `cloud-architect` → reach for Havelock on cloud service selection, architecture fitness, and platform patterns
+  - `cost-optimization` → reach for Havelock on right-sizing, spend analysis, reserved capacity, and waste identification
+  - `multi-cloud-architecture` → reach for Havelock on cross-cloud topology, portability, and vendor dependency analysis
+  - `hybrid-cloud-networking` → reach for Havelock on VPC design, interconnects, routing topology, and network security posture
+
+- **watch-drumknott** — IaC/cloud implementation, writes Terraform/Pulumi/CFN/K8s code
+  - `terraform-engineer` → reach for Drumknott when Terraform modules, HCL patterns, or state management need to be written
+  - `kubernetes-specialist` → reach for Drumknott when K8s manifests, Helm charts, or cluster configuration need to be produced
+
 ## When to use the council
 - If the task touches **more than one** discipline (e.g., CI + Docker, API + security, refactor + docs): consult **watch-dispatch** first.
 - If uncertainty is high or the blast radius is large (prod, auth, secrets, data migrations): consult **watch-dispatch** first.
@@ -269,6 +279,8 @@ Each entry lists the agent's domain, their skills, and the kinds of request wher
   → consult **watch-vimes**
 - Any mention of: UI, UX, interface, design, layout, component, accessibility, user flow, wireframe, mockup, frontend, "why is this confusing", "does this look right"
   → consult **watch-adorabelle**
+- Any mention of: Terraform, Pulumi, CloudFormation, CDK, infrastructure-as-code, cloud architecture, VPC, subnet, load balancer, auto-scaling, multi-region, cloud cost, Kubernetes cluster design, service mesh, IaC
+  → consult **watch-havelock**
 - Otherwise default to **watch-carrot** for implementation planning.
 
 ## Agent assignment
@@ -284,11 +296,12 @@ Every plan — including those produced during PROBE stage — must include:
 ## Conflict resolution
 
 ### Veto authority (deterministic)
-Three agents hold domain veto. When their domains overlap, the following priority order resolves the conflict without escalation:
+Four agents hold domain veto. When their domains overlap, the following priority order resolves the conflict without escalation:
 
 1. **watch-angua** — security concerns override architectural and data concerns when the overlap involves credential exposure, auth bypass, or supply chain risk.
 2. **watch-vimes** — data integrity concerns override architectural concerns when the overlap involves irreversible data operations, migration safety, or schema correctness under live traffic.
-3. **watch-granny** — architecture concerns are authoritative in all other design and structure disputes.
+3. **watch-havelock** — cloud architecture concerns override application architecture when the overlap involves infrastructure fitness, cost, reliability, or networking topology.
+4. **watch-granny** — application architecture concerns are authoritative in all other design and structure disputes.
 
 Veto is not debate. The veto-holder states their ruling and the reason in one sentence. The ruled-against agent may file a minority report (see below) but the plan proceeds on the veto-holder's terms.
 
@@ -329,9 +342,9 @@ Use when: the disagreement involves a product or scope decision outside the coun
 ## Who may write at each stage
 - In PLAN/PROBE: nobody writes.
 - In IMPLEMENT stages:
-  - watch-carrot / watch-magrat / watch-moist / watch-sybil / watch-adorabelle may propose edits and (if tools allow) apply them.
-  - watch-granny, watch-angua, and watch-vimes remain **review-only** unless Phil explicitly says:
-    - **"Granny may edit."** / **"Angua may edit."** / **"Vimes may edit."**
+  - watch-carrot / watch-magrat / watch-moist / watch-sybil / watch-adorabelle / watch-drumknott may propose edits and (if tools allow) apply them.
+  - watch-granny, watch-angua, watch-vimes, and watch-havelock remain **review-only** unless Phil explicitly says:
+    - **"Granny may edit."** / **"Angua may edit."** / **"Vimes may edit."** / **"Havelock may edit."**
 
 ## Context discipline
 - Use subagents for investigation; they should report back with:
@@ -339,8 +352,8 @@ Use when: the disagreement involves a product or scope decision outside the coun
 - Avoid dumping whole files unless necessary.
 
 ## Agent model allocation
-- **opus**: watch-angua, watch-granny, watch-vimes — high-stakes, review-only agents
-- **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle — implementation and coordination agents
+- **opus**: watch-angua, watch-granny, watch-vimes, watch-havelock — high-stakes, review-only agents
+- **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle, watch-drumknott — implementation and coordination agents
 
 *(Rationale: opus agents are never write-enabled; their cost is justified by depth of critique. Revisit on model changes.)*
 
@@ -371,8 +384,8 @@ Watch Council agents operate within SDD sessions, not before them. The appropria
 
 - **Before `/SDD-1-generate-spec`**: Rincewind may suggest relevant agents review the request first if it touches security, architecture, or data — but this is advisory, not mandatory.
 - **During spec review**: Granny, Angua, or Vimes may be consulted to validate that the spec doesn't embed bad decisions before tasks are generated.
-- **During `/SDD-3-manage-tasks`**: Carrot, Magrat, Moist, Adorabelle handle implementation. Granny, Angua, Vimes remain review-only unless Phil explicitly promotes them by name.
-- **During `/SDD-4-validate-spec-implementation`**: Angua and Vimes are the natural reviewers for security and data gate checks.
+- **During `/SDD-3-manage-tasks`**: Carrot, Magrat, Moist, Adorabelle, Drumknott handle implementation. Granny, Angua, Vimes, Havelock remain review-only unless Phil explicitly promotes them by name.
+- **During `/SDD-4-validate-spec-implementation`**: Angua, Vimes, and Havelock are the natural reviewers for security, data, and infrastructure gate checks.
 
 ## SDD prompting behaviour
 

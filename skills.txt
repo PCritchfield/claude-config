@@ -1,0 +1,63 @@
+# Watch Council Skills Manifest
+#
+# Format: source_repo skill_name
+# Lines starting with # are comments. Blank lines are ignored.
+#
+# This file declares every skill the Watch Council agents depend on.
+# Run install_skills.sh to install them all.
+
+# ── obra/superpowers ─────────────────────────────────────────────────────────
+# Core development workflow skills used by Carrot, Magrat, and Moist
+obra/superpowers                    finishing-a-development-branch
+obra/superpowers                    requesting-code-review
+obra/superpowers                    systematic-debugging
+obra/superpowers                    test-driven-development
+obra/superpowers                    verification-before-completion
+obra/superpowers                    writing-skills
+
+# ── wshobson/agents ──────────────────────────────────────────────────────────
+# Backend, cloud infrastructure, and database skills
+wshobson/agents                     api-design-principles
+wshobson/agents                     architecture-patterns
+wshobson/agents                     code-review-excellence
+wshobson/agents                     cost-optimization
+wshobson/agents                     hybrid-cloud-networking
+wshobson/agents                     multi-cloud-architecture
+wshobson/agents                     postgresql-table-design
+
+# ── jeffallan/claude-skills ──────────────────────────────────────────────────
+# IaC and cloud platform skills for Havelock and Drumknott
+jeffallan/claude-skills             cloud-architect
+jeffallan/claude-skills             kubernetes-specialist
+jeffallan/claude-skills             terraform-engineer
+
+# ── supercent-io/skills-template ─────────────────────────────────────────────
+# Documentation, security, and workflow skills
+supercent-io/skills-template        api-documentation
+supercent-io/skills-template        database-schema-design
+supercent-io/skills-template        git-workflow
+supercent-io/skills-template        security-best-practices
+supercent-io/skills-template        technical-writing
+supercent-io/skills-template        workflow-automation
+
+# ── anthropics/skills ────────────────────────────────────────────────────────
+# Official Anthropic skills
+anthropics/skills                   doc-coauthoring
+anthropics/skills                   frontend-design
+
+# ── liatrio-labs/ai-prompts ──────────────────────────────────────────────────
+# Development workflow utilities
+liatrio-labs/ai-prompts             create-mermaid-diagrams
+liatrio-labs/ai-prompts             create-pull-request
+liatrio-labs/ai-prompts             git-commit-conventional
+
+# ── vercel-labs ──────────────────────────────────────────────────────────────
+# Browser automation, design guidelines, skill discovery
+vercel-labs/agent-browser           agent-browser
+vercel-labs/agent-skills            web-design-guidelines
+vercel-labs/skills                  find-skills
+
+# ── Platform-specific skills ─────────────────────────────────────────────────
+github/awesome-copilot              git-commit
+better-auth/skills                  better-auth-best-practices
+supabase/agent-skills               supabase-postgres-best-practices

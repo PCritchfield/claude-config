@@ -10,7 +10,7 @@ Version-controlled backup of the hand-maintained files that live in `~/.claude/`
 claude/.claude/
 ├── CLAUDE.md           # Global personality + Watch Council charter + SDD workflow
 ├── settings.json       # Claude Code settings: model, permissions, env vars, spinners
-├── agents/             # Watch Council agent definitions (10 agents)
+├── agents/             # Watch Council agent definitions (12 agents)
 ├── commands/           # Empty — SDD commands come from an external package
 └── skills/             # Hand-maintained skills (not symlinked from external packages)
     ├── obsidian-summary/
@@ -54,7 +54,7 @@ The main configuration file. It contains three sections:
 
 ## The Watch Council
 
-Ten specialised subagent reviewers, named after characters from Terry Pratchett's Discworld. Each agent has a defined domain, a set of skills, and clear rules about when they may write versus when they are review-only.
+Twelve specialised subagent reviewers, named after characters from Terry Pratchett's Discworld. Each agent has a defined domain, a set of skills, and clear rules about when they may write versus when they are review-only.
 
 | Agent | Domain |
 |-------|--------|
@@ -67,17 +67,20 @@ Ten specialised subagent reviewers, named after characters from Terry Pratchett'
 | `watch-sybil` | Docs, PR text, commit messages, onboarding clarity, ADRs |
 | `watch-vimes` | Database, schema migrations, query safety, data integrity (holds veto) |
 | `watch-adorabelle` | UX/UI design, interface clarity, component design, accessibility |
+| `watch-havelock` | IaC/cloud architecture review, cost, reliability, networking, K8s cluster design (holds veto) |
+| `watch-drumknott` | IaC/cloud implementation — writes Terraform, Pulumi, CloudFormation, K8s manifests |
 | `watch-nobby` | PR/MR diff analysis — reads the actual diff, categorises changes, summons the right council agents |
 
 ### Veto authority
 
-Three agents hold domain veto. When their domains overlap, the following priority order resolves conflicts without escalation:
+Four agents hold domain veto. When their domains overlap, the following priority order resolves conflicts without escalation:
 
 | Priority | Agent | Veto scope |
 |----------|-------|------------|
 | 1 | `watch-angua` | Security concerns override architectural and data concerns when the overlap involves credential exposure, auth bypass, or supply chain risk |
 | 2 | `watch-vimes` | Data integrity concerns override architectural concerns when the overlap involves irreversible data operations, migration safety, or schema correctness under live traffic |
-| 3 | `watch-granny` | Architecture concerns are authoritative in all other design and structure disputes |
+| 3 | `watch-havelock` | Cloud architecture concerns override application architecture when the overlap involves infrastructure fitness, cost, reliability, or networking topology |
+| 4 | `watch-granny` | Application architecture concerns are authoritative in all other design and structure disputes |
 
 Veto is deterministic, not a debate. The veto-holder states their ruling and the reason in one sentence. The overruled agent may file a **minority report** (what they'd do differently and why, in two sentences), which travels with the plan for the user to review. The full charter, including conflict resolution rules and the promotion path from Plan Mode to implementation, is in `CLAUDE.md`.
 
@@ -144,7 +147,7 @@ The alternative — agents that write on first instinct — produces fast output
 
 ### Veto authority is deterministic
 
-Three agents hold domain veto: Angua (security), Vimes (data integrity), Granny (architecture). When their domains overlap, the priority order is fixed: Angua > Vimes > Granny.
+Four agents hold domain veto: Angua (security), Vimes (data integrity), Havelock (cloud/IaC architecture), Granny (application architecture). When their domains overlap, the priority order is fixed: Angua > Vimes > Havelock > Granny.
 
 The reason for deterministic resolution rather than debate is that agent debates produce noise and stall sessions. The veto-holder states their ruling in one sentence. The overruled agent files a two-sentence minority report. The plan proceeds. You have the dissenting view on record without burning time on a council argument.
 
@@ -152,9 +155,9 @@ The minority report matters. It's not a concession mechanism — it's an audit m
 
 ### Opus for review-only agents, Sonnet for implementation agents
 
-Angua, Vimes, and Granny run on Opus. Every other agent runs on Sonnet.
+Angua, Vimes, Havelock, and Granny run on Opus. Every other agent runs on Sonnet.
 
-The three veto-holders are never allowed to write code by default. Their value is depth of analysis, not speed of output. Opus costs more per token — that cost is justified when an agent is doing a deep security review or architectural critique, not when it's writing a README or a Makefile alias.
+The four veto-holders are never allowed to write code by default. Their value is depth of analysis, not speed of output. Opus costs more per token — that cost is justified when an agent is doing a deep security review or architectural critique, not when it's writing a README or a Makefile alias.
 
 Implementation agents run on Sonnet because speed matters for code generation and the output can be reviewed before it lands. The model allocation and the write permissions are designed together: the expensive, careful model reviews; the faster model implements.
 
