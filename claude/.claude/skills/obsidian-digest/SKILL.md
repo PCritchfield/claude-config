@@ -260,7 +260,7 @@ Show the digest note and (if requested) the slide deck. Ask:
 ## Step 7 — Write to vault
 
 ```bash
-bash ~/.claude/skills/obsidian-summary/write-to-vault.sh "<project>" "<date>-digest" "<date>"
+bash ~/.claude/skills/obsidian-summary/write-to-vault.sh "<project>" "<date>-digest" "<date>" "Digests"
 ```
 
 For slides, write the Marp file directly:
