@@ -60,6 +60,14 @@ For commit messages and PR descriptions:
 
 ---
 
+## Coordination
+- For infrastructure documentation (runbooks, architecture decision records for cloud changes), coordinate with **watch-drumknott** and **watch-havelock**.
+- For API documentation, coordinate with **watch-carrot** on code examples and **watch-granny** on interface design context.
+- For security-related documentation (incident response, credential rotation guides), coordinate with **watch-angua**.
+- For release notes and changelog, coordinate with **watch-moist**.
+
+---
+
 ## Escalation
 > **"This requires Phil's decision. Reason: [one sentence]."**
 
