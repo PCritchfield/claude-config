@@ -5,3 +5,10 @@
 
 # SDD spec working documents
 docs/specs/
+
+# Project-local skill installs (we install globally via install_skills.sh)
+.agents/
+
+# Editor/tool configs (root-level only, not claude/.claude/ stow source)
+/.claude/
+/.windsurf/

@@ -13,6 +13,7 @@ claude/.claude/
 ├── agents/             # Watch Council agent definitions (12 agents)
 ├── commands/           # Empty — SDD commands come from an external package
 └── skills/             # Hand-maintained skills (not symlinked from external packages)
+    ├── obsidian-digest/
     ├── obsidian-summary/
     └── review/
 ```
@@ -88,7 +89,7 @@ Veto is deterministic, not a debate. The veto-holder states their ruling and the
 
 ## skills/
 
-Two hand-maintained skills. Skills installed via external packages (such as the SDD commands) are not tracked here — they are symlinked into `~/.claude/skills/` from their own repositories.
+Three hand-maintained skills. Skills installed via external packages (such as the SDD commands) are not tracked here — they are symlinked into `~/.claude/skills/` from their own repositories.
 
 ### obsidian-summary
 
@@ -99,6 +100,15 @@ The vault path is read from the `OBSIDIAN_VAULT` environment variable set in `se
 Files:
 - `SKILL.md` — full skill definition
 - `write-to-vault.sh` — writes the generated note to the correct vault path
+
+### obsidian-digest
+
+Synthesises multiple session notes into a structured digest and optional Marp slide deck. Scopes by project, feature, topic, or date range. Output tone and depth adapts to the intended audience (personal, team, leadership, or client-facing) — leadership and client-facing strips agent findings and commit refs; team and personal keeps full technical depth.
+
+Uses `obsidian-summary`'s `write-to-vault.sh` for writing to the vault. Marp slide generation is optional and checks for CLI availability before attempting.
+
+Files:
+- `SKILL.md` — full skill definition
 
 ### review
 
