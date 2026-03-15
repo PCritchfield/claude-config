@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # write-to-vault.sh
-# Writes a session summary to the Obsidian vault.
-# Usage: echo "<markdown>" | bash write-to-vault.sh "<project>" "<label>" "<date>"
+# Writes a note to the Obsidian vault.
+# Usage: echo "<markdown>" | bash write-to-vault.sh "<project>" "<label>" "<date>" [subfolder]
 #
 # Arguments:
 #   $1 — project name (e.g. emerald-grove-pet-clinic)
 #   $2 — session label (e.g. clinic_issue_1)
 #   $3 — date string (e.g. 2026-03-04)
+#   $4 — vault subfolder (optional, default: "AI Sessions")
+#        e.g. "Digests" for obsidian-digest, "AI Sessions" for obsidian-summary
 #
 # Environment:
 #   OBSIDIAN_VAULT — override vault path (optional)
@@ -14,7 +16,6 @@
 set -euo pipefail
 
 VAULT="${OBSIDIAN_VAULT:-/Users/philc/Documents/obsidian/Vault}"
-AI_SESSIONS_DIR="$VAULT/AI Sessions"
 FALLBACK_LOG="${HOME}/.claude/obsidian-errors.log"
 
 # ── Args ──────────────────────────────────────────────────────────────────────
@@ -22,6 +23,9 @@ FALLBACK_LOG="${HOME}/.claude/obsidian-errors.log"
 PROJECT="${1:-unknown}"
 LABEL="${2:-unknown}"
 DATE="${3:-$(date +"%Y-%m-%d")}"
+SUBFOLDER="${4:-AI Sessions}"
+
+NOTES_DIR="$VAULT/$SUBFOLDER"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -58,9 +62,9 @@ fi
 
 # ── Build paths ───────────────────────────────────────────────────────────────
 
-SESSION_DIR="$AI_SESSIONS_DIR/$PROJECT/$LABEL"
+SESSION_DIR="$NOTES_DIR/$PROJECT/$LABEL"
 SESSION_FILE="$SESSION_DIR/${DATE}-session.md"
-INDEX_FILE="$AI_SESSIONS_DIR/_index.md"
+INDEX_FILE="$NOTES_DIR/_index.md"
 
 mkdir -p "$SESSION_DIR"
 
@@ -82,7 +86,7 @@ printf '%s\n' "$CONTENT" > "$FINAL_FILE"
 # ── Update index ──────────────────────────────────────────────────────────────
 
 if [[ ! -f "$INDEX_FILE" ]]; then
-  mkdir -p "$AI_SESSIONS_DIR"
+  mkdir -p "$NOTES_DIR"
   cat > "$INDEX_FILE" <<'EOF'
 ---
 title: AI Sessions Index

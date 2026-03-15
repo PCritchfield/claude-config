@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "cloud-architect": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "23fbb7f97646d0a392736b3468828459d9e19205be2166a48c3362c96ebd9028"
+    },
+    "cost-optimization": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "b0b1d4e8aa01a3befa06323cf244497b62bbc450d8b96f8085187ac04a3de9d6"
+    },
+    "hybrid-cloud-networking": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "5f187c89dcc77d6c2da1a0368ebeb4b61128232053c70c4c4063fcacfc31353a"
+    },
+    "kubernetes-specialist": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "0201bb26821bd6de6ea341f45da863ef70bba0b44363da72f26b7bf7c86869e9"
+    },
+    "multi-cloud-architecture": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "622045104622c547e42414b73c017ebb6463202fcc2ecf097fe0fb0ba1c4c04d"
+    },
+    "terraform-engineer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "a67f54023997c0ffed2aebec6b15cc14fa69a20b51ea13b92b658719a2e95c0a"
+    }
+  }
+}
