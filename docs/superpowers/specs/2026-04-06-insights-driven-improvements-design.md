@@ -22,6 +22,12 @@ Two lower-priority items receive light hardening:
 - `settings.json` is global (installed via stow to `~/.claude/`). Hooks must be project-agnostic.
 - Agent definitions are solid and well-scoped — friction is at the orchestration layer, not the agent layer.
 
+## Dependencies
+
+- **`/simplify`** — A superpowers marketplace skill (from obra/superpowers), already available in the environment via the superpowers plugin. Not a local skill and does not need to be added to `skills.txt`.
+- **`/review`** — A local custom skill at `claude/.claude/skills/review/`. Already handles Watch Council orchestration internally (platform detection, watch-nobby dispatch, Obsidian write, PR comment posting).
+- **`/create-pull-request`** — A superpowers marketplace skill, already available via the superpowers plugin.
+
 ## Design
 
 ### Change 1a: CI Pre-flight Protocol (CLAUDE.md)
@@ -36,6 +42,8 @@ Instructs Rincewind to detect and run the project's local validation suite befor
 
 Failures must be fixed before pushing. This is not optional.
 
+Note: The post-edit hook (Change 2) catches most formatting issues at edit time. The CI pre-flight serves as a safety net for issues the hook does not cover — type checking (`pyright`, `tsc`), linting rules beyond formatting (`eslint`), and tools not included in the hook. Both layers are intentional (defense in depth).
+
 **Addresses:** Friction D
 
 ### Change 1b: Parallel Agent Pre-flight Protocol (CLAUDE.md)
@@ -45,7 +53,7 @@ New section in the Watch Council Charter, adjacent to 1a.
 Five-step checklist before dispatching parallel agents:
 1. Working tree clean (`git status`)
 2. Branches exist (verify local and remote)
-3. Quick permission test (spawn trivial agent to confirm sandbox)
+3. Quick permission test — spawn a single agent with a trivial Bash command (e.g., `echo "sandbox ok"`) and confirm it completes. If it fails with a permission error, do not dispatch the full batch.
 4. Worktree directory check (`git worktree list`, prune stale entries)
 5. Scope each agent narrowly (one task, one branch, one deliverable)
 
@@ -57,7 +65,7 @@ Any step failure must be resolved before dispatching.
 
 New section in the Watch Council Charter, adjacent to 1a and 1b.
 
-Instructs Rincewind to suggest the post-implementation polish sequence when SDD-3 tasks are complete or implementation looks PR-ready. The sequence:
+Instructs Rincewind to suggest the post-implementation polish sequence when SDD-3 tasks are complete or implementation looks PR-ready. The expected sequence relative to SDD stages is: SDD-3 completes → `/polish` runs → SDD-4 validates (if applicable). The sequence:
 1. Create/open PR(s)
 2. Run `/simplify` and `/review` in parallel
 3. Push fixes
@@ -77,7 +85,7 @@ New `"hooks"` key in `settings.json`:
   "postToolUse": [
     {
       "matcher": "Write|Edit",
-      "command": "bash -c '[ -f ruff.toml ] || [ -f pyproject.toml ] && ruff check --fix --quiet . && ruff format --quiet . 2>/dev/null; [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ] && npx prettier --write --log-level error . 2>/dev/null; true'"
+      "command": "bash -c 'FILES=$(git diff --name-only 2>/dev/null); [ -z \"$FILES\" ] && exit 0; { [ -f ruff.toml ] || [ -f pyproject.toml ]; } && echo \"$FILES\" | grep -qE \"\\.py$\" && ruff check --fix --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") && ruff format --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") 2>/dev/null; { [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; } && echo \"$FILES\" | grep -qE \"\\.(js|ts|jsx|tsx|css|json)$\" && npx prettier --write --log-level error $(echo \"$FILES\" | grep -E \"\\.(js|ts|jsx|tsx|css|json)$\") 2>/dev/null; true'"
     }
   ]
 }
@@ -85,15 +93,18 @@ New `"hooks"` key in `settings.json`:
 
 Behavior:
 - Fires after every `Edit` or `Write` tool use
+- Uses `git diff --name-only` to scope to changed files only — does not touch files outside the current task
 - Detects toolchain by config file presence (ruff.toml/pyproject.toml for Python, .prettierrc variants for JS/TS)
-- Runs linter/formatter with `--fix` (auto-corrects) and `--quiet` (minimal output)
-- No-op for projects without matching config files
+- Filters changed files by extension before passing to the formatter (`.py` for ruff, `.js/.ts/.jsx/.tsx/.css/.json` for prettier)
+- Uses `{ ...; }` grouping to avoid shell operator precedence bugs with `||` and `&&`
+- No-op if no files have changed or project has no matching config files
 - Trailing `; true` ensures hook never blocks
 
 Trade-offs:
 - Catches formatting at edit time, not push time
-- Runs on every edit including non-code files (fast due to incremental caching)
+- Scoped to changed files only — no surprise modifications to unrelated files
 - `npx prettier` has cold-start cost on first invocation
+- `git diff --name-only` only catches unstaged changes; staged-then-edited files are still covered since they appear in diff
 
 **Addresses:** Friction D
 
@@ -115,7 +126,7 @@ Orchestrates the post-implementation workflow:
 
 3. Parallel polish
    - Dispatch /simplify as Agent A
-   - Dispatch /review as Agent B (Watch Council via watch-nobby)
+   - Dispatch /review as Agent B
    - Both run concurrently
 
 4. Apply fixes
@@ -177,11 +188,13 @@ No changes. Friction patterns are orchestration-level, not agent-level.
 
 ## Verification
 
-1. **CLAUDE.md changes**: Read the file and confirm new sections are present, correctly placed, and don't break existing structure.
-2. **Hook**: Edit a Python file in a project with `pyproject.toml` and confirm ruff runs automatically. Edit a JS file in a project with `.prettierrc` and confirm prettier runs. Edit a file in a project with neither and confirm no error.
-3. **`/polish` skill**: Invoke `/polish` after a completed implementation and confirm it follows the prescribed sequence (PR creation, parallel dispatch, fix push, reviewer check, tech debt surfacing).
-4. **TDD hardening**: During SDD-3, intentionally write implementation before test — confirm Rincewind flags it.
-5. **Merge gate**: Attempt to merge a PR with pending reviewers — confirm Rincewind blocks and cites the gate.
+1. **CLAUDE.md changes**: Read the file and confirm new sections (CI Pre-flight, Parallel agent pre-flight, Post-implementation polish) are present between "Context discipline" and "Agent model allocation." The output gates section should now have 5 items. The SDD prompting behaviour section should include the TDD enforcement line. Expected: `grep -c "## CI Pre-flight\|## Parallel agent pre-flight\|## Post-implementation polish" CLAUDE.md` returns 3.
+2. **Hook (Python)**: In a project with `pyproject.toml`, introduce a formatting violation (e.g., extra whitespace), use `Edit` tool. Expected: hook output shows ruff ran, file is auto-corrected, no manual intervention needed.
+3. **Hook (JS/TS)**: In a project with `.prettierrc`, introduce a formatting violation, use `Edit` tool. Expected: hook output shows prettier ran, file is auto-corrected.
+4. **Hook (no toolchain)**: In a project with neither config file, use `Edit` tool. Expected: no hook output, no error, edit completes normally.
+5. **`/polish` skill**: Invoke `/polish` after a completed implementation. Expected: skill creates PR (or detects existing), dispatches simplify and review as parallel agents, pushes fix commits, reports `gh pr checks` status, and surfaces tech debt candidates for approval.
+6. **TDD hardening**: During SDD-3, intentionally write implementation before test. Expected: Rincewind flags the violation and requests the failing test be written first.
+7. **Merge gate**: Attempt to merge a PR with pending reviewers. Expected: Rincewind cites output gate 5 and blocks until `gh pr checks` shows all reviewers complete.
 
 ## Rollback
 
@@ -191,7 +204,7 @@ No changes. Friction patterns are orchestration-level, not agent-level.
 
 ## Risks and Assumptions
 
-- **Hook performance**: Assumes ruff and prettier are fast enough on incremental runs to not noticeably slow down editing. If this proves wrong, the hook can be scoped to the edited file rather than `.`.
+- **Hook performance**: Hook is scoped to changed files via `git diff --name-only`, so it only processes files that have been modified. Performance should be fast for typical edit sessions. If `npx prettier` cold-start is too slow, consider installing prettier globally or using a project-local `node_modules/.bin/prettier` path.
 - **Hook project detection**: Relies on config file presence (ruff.toml, pyproject.toml, .prettierrc). Projects with non-standard config locations won't be detected. This is acceptable — those projects can add project-level hooks.
 - **`/polish` parallel dispatch**: Depends on `/simplify` and `/review` being dispatchable as concurrent agents. If sandbox restrictions prevent this, the skill should fall back to sequential execution.
 - **Global scope**: All changes apply globally via stow. Project-specific overrides are possible via project-level CLAUDE.md and settings.local.json if needed.
