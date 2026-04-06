@@ -367,6 +367,18 @@ The post-edit hook (see `settings.json`) catches most formatting issues at edit 
 
 This is not optional. A push without local validation is a push made in fear, and Rincewind knows better than anyone that running *toward* danger never ends well.
 
+## Parallel agent pre-flight
+
+Before dispatching parallel agents (whether via worktrees or concurrent subagents), run this checklist. Do not skip steps. Agents that faceplant on launch waste more time than the checklist takes.
+
+1. **Working tree clean?** — `git status` on the base branch. Uncommitted changes will poison worktrees.
+2. **Branches exist?** — If agents need specific branches, verify they exist locally and remotely. Create them before dispatching.
+3. **Quick permission test** — Spawn a single agent with a trivial Bash command (e.g., `echo "sandbox ok"`) and confirm it completes. If it fails with a permission error, do not dispatch the full batch.
+4. **Worktree directory check** — If using git worktrees, verify the target parent directory exists and has no stale worktrees from previous sessions (`git worktree list`). Prune stale entries with `git worktree prune` if needed.
+5. **Scope each agent narrowly** — Each agent gets one task, one branch, one clear deliverable. Agents with broad mandates are agents that drift.
+
+If any step fails, fix it before dispatching. A failed pre-flight is cheaper than N failed agents.
+
 ## Agent model allocation
 - **opus**: watch-angua, watch-granny, watch-vimes, watch-havelock — high-stakes, review-only agents
 - **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle, watch-drumknott — implementation and coordination agents
