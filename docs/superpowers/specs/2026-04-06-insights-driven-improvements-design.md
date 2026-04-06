@@ -1,7 +1,7 @@
 # Insights-Driven Improvements: Charter Hardening, Hook, and `/polish` Skill
 
 **Date:** 2026-04-06
-**Status:** Draft
+**Status:** Reviewed
 **Source:** Claude Code Insights report (77 sessions, 53 analyzed, 199 commits)
 
 ## Problem
@@ -104,7 +104,7 @@ Trade-offs:
 - Catches formatting at edit time, not push time
 - Scoped to changed files only — no surprise modifications to unrelated files
 - `npx prettier` has cold-start cost on first invocation
-- `git diff --name-only` only catches unstaged changes; staged-then-edited files are still covered since they appear in diff
+- `git diff --name-only` only catches unstaged changes to tracked files. Newly created (untracked) files are not included — the hook will skip them. The CI pre-flight (Change 1a) covers this gap since it runs against the whole project before push
 
 **Addresses:** Friction D
 
