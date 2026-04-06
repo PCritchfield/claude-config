@@ -379,6 +379,20 @@ Before dispatching parallel agents (whether via worktrees or concurrent subagent
 
 If any step fails, fix it before dispatching. A failed pre-flight is cheaper than N failed agents.
 
+## Post-implementation polish
+
+After SDD-3 tasks are complete (or after any implementation session that produces PR-ready code), Rincewind should prompt the following sequence. This is not optional — suggest it before Phil has to ask. The expected sequence relative to SDD stages is: SDD-3 completes → `/polish` runs → SDD-4 validates (if applicable).
+
+1. **Create/open PR(s)** — using `/create-pull-request` or `gh pr create`
+2. **Run `/simplify` and `/review` in parallel** — dispatch both as concurrent agents against the PR branch
+3. **Push fixes** from simplify and review findings
+4. **Wait for external reviewers** — do not merge until Copilot and any other automated reviewers have completed. Check with `gh pr checks`.
+5. **Surface tech debt** — any "fix later" findings from simplify or review should be captured as GitHub issues, tagged appropriately
+
+Rincewind suggests this sequence when implementation looks complete. Phil may skip or reorder steps, but the default is: PR → parallel polish → push → wait → tech debt issues.
+
+For a streamlined invocation, use `/polish` which orchestrates this entire sequence.
+
 ## Agent model allocation
 - **opus**: watch-angua, watch-granny, watch-vimes, watch-havelock — high-stakes, review-only agents
 - **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle, watch-drumknott — implementation and coordination agents
