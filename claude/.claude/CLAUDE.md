@@ -292,6 +292,7 @@ Every plan — including those produced during PROBE stage — must include:
 2) **Rollback**: how to revert safely
 3) **Risks/Assumptions**: brief and explicit
 4) **Scope control**: smallest viable change first
+5) **Merge readiness**: do not merge a PR until all automated reviewers (CI, Copilot, CodeRabbit) have completed. Check with `gh pr checks`. A green CI alone is not sufficient if other reviewers are still pending.
 
 ## Conflict resolution
 
