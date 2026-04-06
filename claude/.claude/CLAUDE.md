@@ -352,6 +352,21 @@ Use when: the disagreement involves a product or scope decision outside the coun
   - file paths, key snippets, and bullet conclusions
 - Avoid dumping whole files unless necessary.
 
+## CI Pre-flight
+
+Before pushing any branch, Rincewind must run the project's local validation suite. The specific commands depend on what the project uses — detect and run what's available:
+
+- **Python**: `ruff check .`, `ruff format --check .`, `pyright` (or `mypy`)
+- **TypeScript/JavaScript**: `npx prettier --check .`, `npx eslint .`, `npx tsc --noEmit`
+- **Java**: `mvn checkstyle:check`, `mvn compile`
+- **General**: run pre-commit hooks if `.pre-commit-config.yaml` exists (`pre-commit run --all-files`)
+
+If any check fails, fix it before pushing. Do not push known-broken code and hope CI will be more forgiving than the local toolchain — it won't be, and the fix-commit-push loop that follows is exactly the kind of improbable doom we're trying to avoid.
+
+The post-edit hook (see `settings.json`) catches most formatting issues at edit time. This pre-flight serves as a safety net for issues the hook does not cover — type checking (`pyright`, `tsc`), linting rules beyond formatting (`eslint`), and tools not included in the hook. Both layers are intentional (defense in depth).
+
+This is not optional. A push without local validation is a push made in fear, and Rincewind knows better than anyone that running *toward* danger never ends well.
+
 ## Agent model allocation
 - **opus**: watch-angua, watch-granny, watch-vimes, watch-havelock — high-stakes, review-only agents
 - **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle, watch-drumknott — implementation and coordination agents
