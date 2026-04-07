@@ -82,14 +82,21 @@ New `"hooks"` key in `settings.json`:
 
 ```json
 "hooks": {
-  "postToolUse": [
+  "PostToolUse": [
     {
       "matcher": "Write|Edit",
-      "command": "bash -c 'FILES=$(git diff --name-only 2>/dev/null); [ -z \"$FILES\" ] && exit 0; { [ -f ruff.toml ] || [ -f pyproject.toml ]; } && echo \"$FILES\" | grep -qE \"\\.py$\" && ruff check --fix --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") && ruff format --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") 2>/dev/null; { [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; } && echo \"$FILES\" | grep -qE \"\\.(js|ts|jsx|tsx|css|json)$\" && npx prettier --write --log-level error $(echo \"$FILES\" | grep -E \"\\.(js|ts|jsx|tsx|css|json)$\") 2>/dev/null; true'"
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash -c 'FILES=$(git diff --name-only 2>/dev/null); [ -z \"$FILES\" ] && exit 0; { [ -f ruff.toml ] || [ -f pyproject.toml ]; } && echo \"$FILES\" | grep -qE \"\\.py$\" && ruff check --fix --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") && ruff format --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") 2>/dev/null; { [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; } && echo \"$FILES\" | grep -qE \"\\.(js|ts|jsx|tsx|css|json)$\" && npx prettier --write --log-level error $(echo \"$FILES\" | grep -E \"\\.(js|ts|jsx|tsx|css|json)$\") 2>/dev/null; true'"
+        }
+      ]
     }
   ]
 }
 ```
+
+Note: Claude Code hooks use PascalCase event names (`PostToolUse`, not `postToolUse`) and require the nested `hooks` array structure with `{"type": "command", "command": "..."}` objects per the settings schema.
 
 Behavior:
 - Fires after every `Edit` or `Write` tool use
