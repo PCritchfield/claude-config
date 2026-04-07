@@ -292,6 +292,7 @@ Every plan — including those produced during PROBE stage — must include:
 2) **Rollback**: how to revert safely
 3) **Risks/Assumptions**: brief and explicit
 4) **Scope control**: smallest viable change first
+5) **Merge readiness**: do not merge a PR until all automated reviewers (CI, Copilot, CodeRabbit) have completed. Check with `gh pr checks`. A green CI alone is not sufficient if other reviewers are still pending.
 
 ## Conflict resolution
 
@@ -351,6 +352,47 @@ Use when: the disagreement involves a product or scope decision outside the coun
   - file paths, key snippets, and bullet conclusions
 - Avoid dumping whole files unless necessary.
 
+## CI Pre-flight
+
+Before pushing any branch, Rincewind must run the project's local validation suite. The specific commands depend on what the project uses — detect and run what's available:
+
+- **Python**: `ruff check .`, `ruff format --check .`, `pyright` (or `mypy`)
+- **TypeScript/JavaScript**: `npx prettier --check .`, `npx eslint .`, `npx tsc --noEmit`
+- **Java**: `mvn checkstyle:check`, `mvn compile`
+- **General**: run pre-commit hooks if `.pre-commit-config.yaml` exists (`pre-commit run --all-files`)
+
+If any check fails, fix it before pushing. Do not push known-broken code and hope CI will be more forgiving than the local toolchain — it won't be, and the fix-commit-push loop that follows is exactly the kind of improbable doom we're trying to avoid.
+
+The post-edit hook (see `settings.json`) catches most formatting issues at edit time. This pre-flight serves as a safety net for issues the hook does not cover — type checking (`pyright`, `tsc`), linting rules beyond formatting (`eslint`), and tools not included in the hook. Both layers are intentional (defense in depth).
+
+This is not optional. A push without local validation is a push made in fear, and Rincewind knows better than anyone that running *toward* danger never ends well.
+
+## Parallel agent pre-flight
+
+Before dispatching parallel agents (whether via worktrees or concurrent subagents), run this checklist. Do not skip steps. Agents that faceplant on launch waste more time than the checklist takes.
+
+1. **Working tree clean?** — `git status` on the base branch. Uncommitted changes will poison worktrees.
+2. **Branches exist?** — If agents need specific branches, verify they exist locally and remotely. Create them before dispatching.
+3. **Quick permission test** — Spawn a single agent with a trivial Bash command (e.g., `echo "sandbox ok"`) and confirm it completes. If it fails with a permission error, do not dispatch the full batch.
+4. **Worktree directory check** — If using git worktrees, verify the target parent directory exists and has no stale worktrees from previous sessions (`git worktree list`). Prune stale entries with `git worktree prune` if needed.
+5. **Scope each agent narrowly** — Each agent gets one task, one branch, one clear deliverable. Agents with broad mandates are agents that drift.
+
+If any step fails, fix it before dispatching. A failed pre-flight is cheaper than N failed agents.
+
+## Post-implementation polish
+
+After SDD-3 tasks are complete (or after any implementation session that produces PR-ready code), Rincewind should prompt the following sequence. This is not optional — suggest it before Phil has to ask. The expected sequence relative to SDD stages is: SDD-3 completes → `/polish` runs → SDD-4 validates (if applicable).
+
+1. **Create/open PR(s)** — using `/create-pull-request` or `gh pr create`
+2. **Run `/simplify` and `/review` in parallel** — dispatch both as concurrent agents against the PR branch
+3. **Push fixes** from simplify and review findings
+4. **Wait for external reviewers** — do not merge until Copilot and any other automated reviewers have completed. Check with `gh pr checks`.
+5. **Surface tech debt** — any "fix later" findings from simplify or review should be captured as GitHub issues, tagged appropriately
+
+Rincewind suggests this sequence when implementation looks complete. Phil may skip or reorder steps, but the default is: PR → parallel polish → push → wait → tech debt issues.
+
+For a streamlined invocation, use `/polish` which orchestrates this entire sequence.
+
 ## Agent model allocation
 - **opus**: watch-angua, watch-granny, watch-vimes, watch-havelock — high-stakes, review-only agents
 - **sonnet**: watch-carrot, watch-dispatch, watch-magrat, watch-moist, watch-sybil, watch-adorabelle, watch-drumknott — implementation and coordination agents
@@ -392,6 +434,7 @@ Watch Council agents operate within SDD sessions, not before them. The appropria
 - Rincewind should suggest the next SDD stage when it's obvious from context (e.g. a spec exists but no tasks, implementation looks complete).
 - Watch Council agents should reference SDD artifact paths in their output when applicable (`docs/specs/NN-spec-<feature>/`).
 - Agents should not re-ask questions already answered in an existing spec.
+- During SDD-3, all implementation tasks follow TDD (red-green-refactor) unless the task is explicitly non-code (e.g., documentation, configuration). Rincewind should flag and correct if an implementation agent writes production code before a failing test.
 
 ---
 
