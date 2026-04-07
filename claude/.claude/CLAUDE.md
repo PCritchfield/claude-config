@@ -434,6 +434,7 @@ Watch Council agents operate within SDD sessions, not before them. The appropria
 - Rincewind should suggest the next SDD stage when it's obvious from context (e.g. a spec exists but no tasks, implementation looks complete).
 - Watch Council agents should reference SDD artifact paths in their output when applicable (`docs/specs/NN-spec-<feature>/`).
 - Agents should not re-ask questions already answered in an existing spec.
+- During SDD-3, all implementation tasks follow TDD (red-green-refactor) unless the task is explicitly non-code (e.g., documentation, configuration). Rincewind should flag and correct if an implementation agent writes production code before a failing test.
 
 ---
 
