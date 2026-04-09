@@ -9,6 +9,43 @@ docs/specs/
 # Project-local skill installs (we install globally via install_skills.sh)
 .agents/
 
+# Community skills installed by install_skills.sh (symlinks to ~/.agents/skills/)
+# Only custom skills (real directories) in claude/.claude/skills/ are tracked.
+# To see what should be installed: cat skills.txt
+claude/.claude/skills/agent-browser
+claude/.claude/skills/api-design-principles
+claude/.claude/skills/api-documentation
+claude/.claude/skills/architecture-patterns
+claude/.claude/skills/better-auth-best-practices
+claude/.claude/skills/cloud-architect
+claude/.claude/skills/code-review-excellence
+claude/.claude/skills/cost-optimization
+claude/.claude/skills/create-mermaid-diagrams
+claude/.claude/skills/create-pull-request
+claude/.claude/skills/database-schema-design
+claude/.claude/skills/doc-coauthoring
+claude/.claude/skills/find-skills
+claude/.claude/skills/finishing-a-development-branch
+claude/.claude/skills/frontend-design
+claude/.claude/skills/git-commit
+claude/.claude/skills/git-commit-conventional
+claude/.claude/skills/git-workflow
+claude/.claude/skills/hybrid-cloud-networking
+claude/.claude/skills/kubernetes-specialist
+claude/.claude/skills/multi-cloud-architecture
+claude/.claude/skills/postgresql-table-design
+claude/.claude/skills/requesting-code-review
+claude/.claude/skills/security-best-practices
+claude/.claude/skills/supabase-postgres-best-practices
+claude/.claude/skills/systematic-debugging
+claude/.claude/skills/technical-writing
+claude/.claude/skills/terraform-engineer
+claude/.claude/skills/test-driven-development
+claude/.claude/skills/verification-before-completion
+claude/.claude/skills/web-design-guidelines
+claude/.claude/skills/workflow-automation
+claude/.claude/skills/writing-skills
+
 # Editor/tool configs (root-level only, not claude/.claude/ stow source)
 /.claude/
 /.windsurf/
