@@ -19,6 +19,48 @@
     ]
   },
   "model": "opus[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/session-start-context.sh",
+            "timeout": 5000,
+            "statusMessage": "Loading prior session context from Obsidian..."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/precompact-checkpoint.sh",
+            "timeout": 5000,
+            "statusMessage": "Saving compaction checkpoint to Obsidian..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILES=$(git diff --name-only 2>/dev/null); [ -z \"$FILES\" ] && exit 0; { [ -f ruff.toml ] || [ -f pyproject.toml ]; } && echo \"$FILES\" | grep -qE \"\\.py$\" && ruff check --fix --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") && ruff format --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") 2>/dev/null; { [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; } && echo \"$FILES\" | grep -qE \"\\.(js|ts|jsx|tsx|css|json)$\" && npx prettier --write --log-level error $(echo \"$FILES\" | grep -E \"\\.(js|ts|jsx|tsx|css|json)$\") 2>/dev/null; true'"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline.sh",
+    "padding": 0
+  },
   "spinnerVerbs": {
     "mode": "replace",
     "verbs": [
@@ -161,22 +203,6 @@
     ]
   },
   "effortLevel": "high",
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline.sh",
-    "padding": 0
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'FILES=$(git diff --name-only 2>/dev/null); [ -z \"$FILES\" ] && exit 0; { [ -f ruff.toml ] || [ -f pyproject.toml ]; } && echo \"$FILES\" | grep -qE \"\\.py$\" && ruff check --fix --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") && ruff format --quiet $(echo \"$FILES\" | grep -E \"\\.py$\") 2>/dev/null; { [ -f .prettierrc ] || [ -f .prettierrc.json ] || [ -f .prettierrc.js ]; } && echo \"$FILES\" | grep -qE \"\\.(js|ts|jsx|tsx|css|json)$\" && npx prettier --write --log-level error $(echo \"$FILES\" | grep -E \"\\.(js|ts|jsx|tsx|css|json)$\") 2>/dev/null; true'"
-          }
-        ]
-      }
-    ]
-  }
+  "autoMemoryEnabled": true,
+  "autoDreamEnabled": true
 }
