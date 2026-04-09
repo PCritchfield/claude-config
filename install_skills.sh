@@ -14,13 +14,15 @@ if ! command -v npx &>/dev/null; then
   exit 1
 fi
 
-# Collect unique source repos from the manifest
-declare -A REPO_SKILLS
+TOTAL=0
+INSTALLED=0
+FAILED_LIST=""
 
 while IFS= read -r line; do
   # Skip comments and blank lines
-  [[ "$line" =~ ^[[:space:]]*# ]] && continue
-  [[ -z "${line// /}" ]] && continue
+  case "$line" in
+    \#*|"") continue ;;
+  esac
 
   # Parse: source_repo skill_name
   repo=$(echo "$line" | awk '{print $1}')
@@ -31,59 +33,49 @@ while IFS= read -r line; do
     continue
   fi
 
-  # Append skill to repo's list (comma-separated)
-  if [ -z "${REPO_SKILLS[$repo]}" ]; then
-    REPO_SKILLS[$repo]="$skill"
+  TOTAL=$((TOTAL + 1))
+  echo "[$TOTAL] Installing $skill from $repo..."
+
+  if npx -y skills add "https://github.com/$repo" --skill "$skill" -g -y </dev/null 2>&1 | tail -1; then
+    INSTALLED=$((INSTALLED + 1))
   else
-    REPO_SKILLS[$repo]="${REPO_SKILLS[$repo]},$skill"
+    echo "  FAILED: $skill from $repo"
+    FAILED_LIST="$FAILED_LIST\n  - $repo/$skill"
   fi
 done < "$MANIFEST"
 
-echo "Installing skills from ${#REPO_SKILLS[@]} source repos..."
-echo ""
-
-FAILED=()
-
-for repo in "${!REPO_SKILLS[@]}"; do
-  skills="${REPO_SKILLS[$repo]}"
-  # Convert comma-separated list to multiple --skill flags
-  skill_flags=""
-  IFS=',' read -ra SKILL_ARRAY <<< "$skills"
-  for s in "${SKILL_ARRAY[@]}"; do
-    skill_flags="$skill_flags --skill $s"
-  done
-
-  echo "── $repo (${#SKILL_ARRAY[@]} skills) ──"
-  echo "   Skills: ${skills//,/, }"
-
-  if npx -y skills add "https://github.com/$repo" $skill_flags -g -y 2>&1 | tail -3; then
-    echo "   Done."
-  else
-    echo "   FAILED — will retry individually."
-    # Retry each skill individually so one failure doesn't block the rest
-    for s in "${SKILL_ARRAY[@]}"; do
-      if ! npx -y skills add "https://github.com/$repo" --skill "$s" -g -y 2>&1 | tail -1; then
-        echo "   FAILED: $s from $repo"
-        FAILED+=("$repo/$s")
+# Fix relative symlinks created by npx — stow makes ~/.claude/skills/ a symlink
+# to the repo, so relative paths (../../.agents/skills/) don't resolve correctly.
+# Replace with absolute paths to $HOME/.agents/skills/.
+SKILLS_DIR="$HOME/.claude/skills"
+FIXED=0
+for item in "$SKILLS_DIR"/*; do
+  [ -L "$item" ] || continue
+  name=$(basename "$item")
+  target=$(readlink "$item")
+  case "$target" in
+    ../../.agents/skills/*)
+      abs_target="$HOME/.agents/skills/$name"
+      if [ -d "$abs_target" ]; then
+        rm "$item"
+        ln -s "$abs_target" "$item"
+        FIXED=$((FIXED + 1))
       fi
-    done
-  fi
-  echo ""
+      ;;
+  esac
 done
+[ $FIXED -gt 0 ] && echo "Fixed $FIXED relative symlinks for stow compatibility."
 
-if [ ${#FAILED[@]} -gt 0 ]; then
-  echo "══════════════════════════════════════"
-  echo "WARNING: ${#FAILED[@]} skill(s) failed to install:"
-  for f in "${FAILED[@]}"; do
-    echo "  - $f"
-  done
+echo ""
+echo "══════════════════════════════════════"
+if [ -n "$FAILED_LIST" ]; then
+  FAIL_COUNT=$((TOTAL - INSTALLED))
+  echo "WARNING: $FAIL_COUNT skill(s) failed to install:"
+  echo -e "$FAILED_LIST"
   echo ""
   echo "Try installing them manually:"
   echo "  npx skills add https://github.com/<repo> --skill <name> -g -y"
   exit 1
 else
-  echo "══════════════════════════════════════"
-  echo "All skills installed successfully."
-  echo ""
-  echo "Installed $(grep -v '^#' "$MANIFEST" | grep -v '^$' | wc -l | tr -d ' ') skills from ${#REPO_SKILLS[@]} repos."
+  echo "All $INSTALLED skills installed successfully."
 fi
