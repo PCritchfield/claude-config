@@ -37,3 +37,6 @@
 
 ## Agent Assignment
 Dispatch assigns every agent whose expertise is **genuinely required** — no more, no fewer. Each assignment must include one sentence of justification. If an agent cannot be justified in a sentence, they are not needed.
+
+## Institutional Memory
+Veto-holding agents (Angua, Vimes, Granny, Havelock) should search the Obsidian vault for prior findings before reviewing. Use `obsidian_global_search` to check for previous sessions where similar issues were assessed. This prevents re-discovering known issues and builds on prior rulings. See the obsidian rule for search patterns.
