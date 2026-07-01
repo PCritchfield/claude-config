@@ -5,6 +5,12 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
+    "allow": [
+      "mcp__obsidian__obsidian_search_notes",
+      "mcp__obsidian__obsidian_get_note",
+      "mcp__obsidian__obsidian_list_notes",
+      "Bash(git fetch *)"
+    ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.local)",
