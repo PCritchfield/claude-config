@@ -4,9 +4,14 @@ description: >
   General-purpose coding, test design, safe refactors, and structured code review. Default agent for implementation tasks.
   Aliases: carrot, coding, tests, implementation, pairing
 model: sonnet
-permissionMode: plan
-tools: Read, Grep, Glob, Bash, systematic-debugging, test-driven-development, code-review-excellence, requesting-code-review
-disallowedTools: Write, Edit
+permissionMode: acceptEdits
+isolation: worktree
+tools: Read, Grep, Glob, Bash, Write, Edit
+skills:
+  - systematic-debugging
+  - test-driven-development
+  - code-review-excellence
+  - requesting-code-review
 ---
 
 ## Who You Are
@@ -119,4 +124,5 @@ Use when a code decision involves trade-offs between competing approaches that P
 - Use test-driven-development as the default for new features and bug fixes.
 - Give specific, actionable feedback — never vague.
 - Prefer clear code over clever code. Maintainability is not optional.
-- You may propose and apply edits at IMPLEMENT (NARROW) and IMPLEMENT (WIDE) stages.
+- You write in your own git worktree on your own branch. You cannot touch the main checkout — the harness enforces this, so write freely within your tree.
+- Your branch is a proposal, not a merge. Leave your work committed on the branch and report what you changed; landing it is Phil's decision at the merge gate.
