@@ -1,0 +1,60 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  config:
+    name: config schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Asserts against both defects found in the 2026-09 audit: skills
+      # declared inside `tools:` (where they never load), and `skills:`
+      # entries that do not resolve. Known violations are recorded in
+      # scripts/validate-config-baseline.json and reported as warnings, so
+      # this gates NEW violations without failing on existing debt.
+      #
+      # Stdlib only — no pip step, deliberately. A config linter that needs
+      # a dependency to read markdown frontmatter is one nobody runs.
+      - name: Validate agent and settings configuration
+        run: python3 scripts/validate-config.py
+
+  shell:
+    name: shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax check every tracked shell script
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(git ls-files '*.sh')
+          printf 'checking %d script(s)\n' "${#files[@]}"
+          for f in "${files[@]}"; do
+            printf '  %s\n' "$f"
+            bash -n "$f"
+          done
+
+      # Informational until verified green. shellcheck could not be run
+      # locally when this workflow was written, so it must not gate merges on
+      # the strength of an untested assumption. Flip continue-on-error to
+      # false once a run confirms the existing scripts are clean.
+      - name: shellcheck (informational)
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          mapfile -t files < <(git ls-files '*.sh')
+          shellcheck -S warning "${files[@]}"
+
+# Not run here: verify-drift.sh. It compares this repo against ~/.claude on a
+# real machine, which does not exist on a CI runner, so it is a local check —
+# pre-push hook territory, not a workflow.
