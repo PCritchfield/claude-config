@@ -152,15 +152,35 @@ FOREIGN="$(git -C "$REPO_DIR" ls-files --others --exclude-standard -- claude/.cl
 if [ -z "$FOREIGN" ]; then
   ok "no untracked files inside claude/.claude"
 else
-  while IFS= read -r f; do
-    [ -z "$f" ] && continue
-    owner="$(sed -n '1,6p' "$REPO_DIR/$f" 2>/dev/null | grep -iEo 'managed by [a-z0-9_-]+|installed by [a-z0-9_-]+' | head -1)"
-    if [ -n "$owner" ]; then
-      warn "$f — $owner (third-party; do not commit)"
-    else
-      warn "$f — untracked inside the stow source"
+  FOREIGN_N=$(printf '%s\n' "$FOREIGN" | grep -c . || true)
+  warn "$FOREIGN_N untracked path(s) inside the stow source, grouped:"
+
+  # Group by claude/.claude/<area>/<name> so an app that drops thousands of
+  # files reports as one line, not thousands. Enumerating every file buries
+  # the signal it is meant to raise.
+  while IFS='|' read -r count group; do
+    [ -z "$group" ] && continue
+    full="$REPO_DIR/$group"
+
+    if [ "$count" -eq 1 ] && [ -f "$full" ]; then
+      owner="$(sed -n '1,6p' "$full" 2>/dev/null \
+               | grep -iEo 'managed by [a-z0-9_-]+|installed by [a-z0-9_-]+' | head -1)"
+      if [ -n "$owner" ]; then
+        printf '        %-46s %s — do not commit\n' "$group" "$owner"
+      else
+        printf '        %-46s untracked\n' "$group"
+      fi
+      continue
     fi
-  done <<< "$FOREIGN"
+
+    lines=$(find "$full" -type f -print0 2>/dev/null | xargs -0 cat 2>/dev/null | wc -l | tr -d ' ')
+    size=$(du -sh "$full" 2>/dev/null | cut -f1 | tr -d ' ')
+    printf '        %-46s %s files, %s lines, %s — app-managed, gitignore it\n' \
+           "$group/" "$count" "${lines:-?}" "${size:-?}"
+  done < <(printf '%s\n' "$FOREIGN" \
+           | awk -F/ 'NF>=4 {print $1"/"$2"/"$3"/"$4; next} {print}' \
+           | sort | uniq -c | sort -rn \
+           | sed -E 's/^ *([0-9]+) /\1|/')
 fi
 
 # ---------------------------------------------------------------------------
