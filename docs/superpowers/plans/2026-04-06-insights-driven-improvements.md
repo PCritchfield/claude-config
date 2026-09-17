@@ -1,5 +1,33 @@
 # Insights-Driven Improvements Implementation Plan
 
+**Status:** Complete — all seven tasks shipped 2026-04. Closed out 2026-09-17.
+
+## Landed
+
+Verified present on `main` at close-out. The plan targeted a single `CLAUDE.md`; the
+charter sections were later split into `claude/.claude/rules/` by
+`refactor/claude-md-rules-split`, so the landing sites differ from the File Map below.
+
+| Task | Landed in |
+|------|-----------|
+| T1 — Output Gate 5 (PR merge safety) | `claude/.claude/rules/council-charter.md` → *Merge readiness* |
+| T2 — CI pre-flight protocol | `claude/.claude/rules/ci-preflight.md` |
+| T3 — Parallel agent pre-flight protocol | `claude/.claude/rules/agent-preflight.md` |
+| T4 — Post-implementation polish | `claude/.claude/rules/post-implementation.md` |
+| T5 — TDD hardening line | `claude/.claude/rules/sdd-workflow.md` |
+| T6 — Post-edit lint/format hook | `claude/.claude/settings.json` → `hooks.PostToolUse` |
+| T7 — `/polish` composite skill | `claude/.claude/skills/polish/SKILL.md` |
+
+> [!warning] Known caveat on T3
+> The parallel agent pre-flight protocol was written to stop agents failing on dirty
+> worktrees and permission issues. The actual cause of those failures was that every
+> agent definition carried `disallowedTools: Write, Edit` and no agent had
+> `isolation: worktree` — so parallel worktree work was impossible at the config level,
+> not the operational level. The checklist is still sound; it was diagnosing the wrong
+> layer. See `fix/carrot-worktree-isolation`.
+
+---
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Reduce three friction patterns (parallel agent pre-flight failures, CI fix loops, manual polish invocation) by adding charter sections, a post-edit hook, and a `/polish` composite skill.

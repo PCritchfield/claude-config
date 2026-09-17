@@ -1,8 +1,15 @@
 # Insights-Driven Improvements: Charter Hardening, Hook, and `/polish` Skill
 
 **Date:** 2026-04-06
-**Status:** Reviewed
+**Status:** Complete — shipped 2026-04, closed out 2026-09-17
 **Source:** Claude Code Insights report (77 sessions, 53 analyzed, 199 commits)
+
+> [!note] Closed out
+> All seven tasks in the implementation plan shipped. This document was never marked
+> done, so it read as an abandoned initiative for five months. See the plan's
+> **Landed** table for where each task ended up. Retained as provenance: this was the
+> first data-driven improvement cycle on this repo, and the prior art for any future
+> session-mining work.
 
 ## Problem
 
