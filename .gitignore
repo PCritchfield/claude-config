@@ -9,6 +9,12 @@ docs/specs/
 # Project-local skill installs (we install globally via install_skills.sh)
 .agents/
 
+# Account/org skills synced by the Claude desktop app into ~/.claude/skills/synced/.
+# Because ~/.claude/skills is a stow symlink into this repo, they land in this
+# working tree. App-managed, machine-specific, per-session UUID directories, and
+# regenerated on demand — never commit them. (Seen: 242 files / 208k lines / 35MB.)
+claude/.claude/skills/synced/
+
 # Community skills installed by install_skills.sh (symlinks to ~/.agents/skills/)
 # Only custom skills (real directories) in claude/.claude/skills/ are tracked.
 # To see what should be installed: cat skills.txt
