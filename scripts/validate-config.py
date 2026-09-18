@@ -311,17 +311,42 @@ def check_settings(report: Report) -> None:
 
 
 def check_stale_ignores(report: Report) -> None:
+    """Report .gitignore entries for skills that no longer exist.
+
+    Only meaningful where the skills are actually installed. The entries name
+    gitignored paths, so a fresh checkout — every CI run — has none of them,
+    and a naive check reports all 33 as stale. That was 87% of the warning
+    output on the first run, which trains readers to skip warnings entirely.
+
+    install_skills.sh creates all of them together, so partial presence means
+    real staleness and total absence means an uninstalled tree.
+    """
     if not GITIGNORE.exists():
         return
-    for line in GITIGNORE.read_text().splitlines():
-        entry = line.strip()
-        if not entry.startswith("claude/.claude/skills/") or entry.endswith("/"):
-            continue
-        if not (REPO / entry).exists():
-            report.warn(
-                f"gitignore:stale:{entry}",
-                f".gitignore: '{entry}' no longer exists on disk.",
-            )
+
+    entries = [
+        entry for entry in (line.strip() for line in GITIGNORE.read_text().splitlines())
+        if entry.startswith("claude/.claude/skills/") and not entry.endswith("/")
+    ]
+    if not entries:
+        return
+
+    missing = [entry for entry in entries if not (REPO / entry).exists()]
+
+    if len(missing) == len(entries):
+        report.warn(
+            "gitignore:uninstalled",
+            f".gitignore: stale-entry check skipped — none of the {len(entries)} "
+            f"ignored skill paths exist, so this is an uninstalled checkout "
+            f"(expected in CI). Run ./install_skills.sh to check for stale entries.",
+        )
+        return
+
+    for entry in missing:
+        report.warn(
+            f"gitignore:stale:{entry}",
+            f".gitignore: '{entry}' no longer exists on disk.",
+        )
 
 
 def main() -> int:
