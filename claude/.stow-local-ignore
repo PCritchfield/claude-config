@@ -1,0 +1,16 @@
+# settings.json is sync-managed, not stowed.
+#
+# Claude Code and its tools save it by writing a temp file and renaming it over
+# the target, which replaces a symlink with a regular file. So a stowed
+# settings.json is silently unlinked by the first save. See
+# claude/.claude/hooks/sync-settings.py for how it is kept in step instead.
+^/\.claude/settings\.json$
+
+# A local ignore file replaces stow's defaults, so restate the ones that apply.
+\.stow-local-ignore
+\.DS_Store
+
+# Editor swap and backup files. Stow anchors each pattern to the whole
+# basename, so these must match the full name, not a suffix.
+.+\.sw[po]
+.+~

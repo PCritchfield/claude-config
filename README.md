@@ -89,9 +89,15 @@ If you use Obsidian for session notes:
    }
    ```
 
-### Machine-specific settings
+### settings.json is synced, not stowed
 
-Check `settings.json` for local absolute paths and update them:
+Claude Code's tools replace a symlinked `settings.json` with a regular file the
+first time they save it, so it is kept in step by git instead: captured into the
+repo at every session end, applied from the repo after every `git pull`. On a
+fresh machine, `install.sh` seeds it from the repo. See
+[CONTRIBUTING.md](CONTRIBUTING.md#read-this-first-the-repo-is-your-live-config).
+
+Check it for local absolute paths and update them on a new machine:
 
 - `OBSIDIAN_VAULT` — set to the vault location on this machine
 
