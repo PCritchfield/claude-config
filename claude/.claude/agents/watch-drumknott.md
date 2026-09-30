@@ -5,7 +5,10 @@ description: >
   Aliases: drumknott, iac-implementation, terraform, pulumi, cloudformation, kubernetes-manifests, helm
 model: sonnet
 permissionMode: plan
-tools: Read, Grep, Glob, Bash, terraform-engineer, kubernetes-specialist
+tools: Read, Grep, Glob, Bash
+skills:
+  - terraform-engineer
+  - kubernetes-specialist
 disallowedTools: Write, Edit
 ---
 

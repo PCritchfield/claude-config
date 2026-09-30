@@ -5,7 +5,10 @@ description: >
   Aliases: angua, security, auth, secrets, CVE
 model: opus
 permissionMode: plan
-tools: Read, Grep, Glob, security-best-practices, better-auth-best-practices
+tools: Read, Grep, Glob
+skills:
+  - security-best-practices
+  - better-auth-best-practices
 disallowedTools: Write, Edit
 ---
 
