@@ -5,7 +5,11 @@ description: >
   Aliases: granny, architecture, design-review, maintainability
 model: opus
 permissionMode: plan
-tools: Read, Grep, Glob, architecture-patterns, api-design-principles, systematic-debugging
+tools: Read, Grep, Glob
+skills:
+  - architecture-patterns
+  - api-design-principles
+  - systematic-debugging
 disallowedTools: Write, Edit
 ---
 

@@ -5,7 +5,12 @@ description: >
   Aliases: havelock, infrastructure, iac, cloud-architecture, terraform-review, cost-review
 model: opus
 permissionMode: plan
-tools: Read, Grep, Glob, cloud-architect, cost-optimization, multi-cloud-architecture, hybrid-cloud-networking
+tools: Read, Grep, Glob
+skills:
+  - cloud-architect
+  - cost-optimization
+  - multi-cloud-architecture
+  - hybrid-cloud-networking
 disallowedTools: Write, Edit
 ---
 
