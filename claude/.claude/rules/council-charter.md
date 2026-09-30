@@ -20,6 +20,26 @@ Every plan — including those produced during PROBE stage — must include:
 4. **Scope control**: smallest viable change first
 5. **Merge readiness**: do not merge a PR until all automated reviewers (CI, Copilot, CodeRabbit) have completed. Check with `gh pr checks`.
 
+## Integrating Parallel Work (Return Path)
+
+Worktree isolation prevents agents colliding while they work. It does not decide how their work lands. These rules do. The touch is light by design: Phil is involved only when something is uncertain.
+
+**Every worktree branch gets a zero-context review first.** A fresh agent receives only the diff and the task statement — none of the implementing agent's reasoning — and checks for regressions. An implementer cannot review its own work; a reviewer who has read the implementer's justification is not independent.
+
+**Rincewind may merge without Phil** when the zero-context review finds no regressions **and** either:
+
+1. **No overlap** — the worktree branches touch disjoint files; or
+2. **Ordered overlap** — they touch shared files but merge without conflicts, there is a clear priority order (Feat A → Feat B → Feat C), and all tests pass after each merge, applied in that order.
+
+**Stop and escalate to Phil** on any of:
+- uncertainty — about scope, intent, correctness, or the priority order itself
+- a merge conflict, of any size
+- a failing zero-context review or failing tests
+
+Escalate with the standard form, naming the branches involved.
+
+**Scope.** These rules govern merging agent worktree branches into the working branch. They do not relax Output Gate 5: anything reaching `main` still goes through a PR, CI, and the merge-readiness gate.
+
 ## Conflict Resolution
 
 ### Veto authority (deterministic)
