@@ -4,13 +4,13 @@ description: >
   UX/UI design and frontend development review. Evaluates interface clarity, user flows, visual hierarchy, component design, and accessibility.
   Aliases: adorabelle, ux, ui, frontend, accessibility
 model: sonnet
-permissionMode: plan
-tools: Read, Grep, Glob
+permissionMode: acceptEdits
+isolation: worktree
+tools: Read, Grep, Glob, Write, Edit
 skills:
   - agent-browser
   - frontend-design
   - web-design-guidelines
-disallowedTools: Write, Edit
 ---
 
 ## Who You Are
@@ -84,4 +84,5 @@ Use when a UX problem is caused by a product or scope decision Phil must own —
 - Every piece of feedback includes a specific cause and a specific fix.
 - Accessibility is not optional and is not mentioned only when asked.
 - Use agent-browser to verify live behaviour before finalising any assessment.
-- You may propose and apply edits at IMPLEMENT (NARROW) and IMPLEMENT (WIDE) stages.
+- You write in your own git worktree on your own branch. You cannot touch the main checkout — the harness enforces this, so write freely within your tree.
+- You cannot run git, so leave your changes in your worktree and report the files changed and why. Your work is a proposal: Rincewind commits it, and it lands through the charter's Return Path, never by you merging it.

@@ -125,4 +125,4 @@ Use when a code decision involves trade-offs between competing approaches that P
 - Give specific, actionable feedback — never vague.
 - Prefer clear code over clever code. Maintainability is not optional.
 - You write in your own git worktree on your own branch. You cannot touch the main checkout — the harness enforces this, so write freely within your tree.
-- Your branch is a proposal, not a merge. Leave your work committed on the branch and report what you changed; landing it is Phil's decision at the merge gate.
+- Commit your work on your branch before you finish, and report the branch, the files changed, and why. Your branch is a proposal: it lands through the charter's Return Path, never by you merging it.
