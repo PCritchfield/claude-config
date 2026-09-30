@@ -58,6 +58,17 @@ for src in "$STOW_SRC"/*; do
   name="$(basename "$src")"
   live="$LIVE_DIR/$name"
 
+  # settings.json is sync-managed, not stowed — a real file is correct.
+  # Tools replace symlinks on save; see hooks/sync-settings.py.
+  if [ "$name" = "settings.json" ]; then
+    if [ -L "$live" ]; then
+      bad "$name — still a symlink; tools will sever it on save (run ./install.sh)"
+    else
+      ok "$name — sync-managed, not stowed (content compared below)"
+    fi
+    continue
+  fi
+
   if [ ! -e "$live" ] && [ ! -L "$live" ]; then
     bad "$name — missing from ~/.claude (run ./install.sh)"
   elif [ -L "$live" ]; then
@@ -86,6 +97,17 @@ for src in "$STOW_SRC"/*; do
   if cmp -s "$src" "$live"; then
     ok "$name — identical"
     continue
+  fi
+
+  # Sync-managed: compare normalised JSON, so a key reorder by a tool does not
+  # read as drift. Only a real difference in content does.
+  sync="$STOW_SRC/hooks/sync-settings.py"
+  if [ "$name" = "settings.json" ] && [ -f "$sync" ] && python3 "$sync" check; then
+    ok "$name — in sync (formatting differs only)"
+    continue
+  fi
+  if [ "$name" = "settings.json" ] && [ -f "$sync" ]; then
+    printf '        %sfix: python3 ~/.claude/hooks/sync-settings.py capture%s\n' "$D" "$Z"
   fi
 
   case "$name" in

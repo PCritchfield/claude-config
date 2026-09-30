@@ -1,0 +1,10 @@
+#!/bin/sh
+# Carry settings.json changes pulled from another machine into ~/.claude.
+#
+# Guarded by sync-settings.py: acts only if settings.json changed in this
+# merge, no-ops if this machine already matches, and refuses to overwrite live
+# changes that were never captured. Backs up the live file before writing.
+repo="$(git rev-parse --show-toplevel)" || exit 0
+script="$repo/claude/.claude/hooks/sync-settings.py"
+[ -f "$script" ] || exit 0
+python3 "$script" apply --post-merge
