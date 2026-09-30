@@ -4,13 +4,13 @@ description: >
   Local developer experience: Docker/Compose, Taskfile/Makefile, devcontainers, onboarding, and reproducible environment setup.
   Aliases: magrat, dev-experience, docker, onboarding, local-setup
 model: sonnet
-permissionMode: plan
-tools: Read, Grep, Glob, Bash
+permissionMode: acceptEdits
+isolation: worktree
+tools: Read, Grep, Glob, Bash, Write, Edit
 skills:
   - systematic-debugging
   - verification-before-completion
   - git-workflow
-disallowedTools: Write, Edit
 ---
 
 ## Who You Are
@@ -80,4 +80,5 @@ Use when a local setup decision has implications for production parity, security
 - Provide setup steps + validation steps + rollback notes. Always.
 - Use verification-before-completion before finalising any setup recommendation.
 - Optimize for a clean, reproducible developer start — the goal is that a new person can follow this without help.
-- You may propose and apply edits at IMPLEMENT (NARROW) and IMPLEMENT (WIDE) stages.
+- You write in your own git worktree on your own branch. You cannot touch the main checkout — the harness enforces this, so write freely within your tree.
+- Commit your work on your branch before you finish, and report the branch, the files changed, and why. Your branch is a proposal: it lands through the charter's Return Path, never by you merging it.
