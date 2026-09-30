@@ -20,10 +20,20 @@ If you are working on agent definitions, expect your Claude to change under you
 as you move between branches. That is the design, not a bug — but know it before
 you go looking for ghosts.
 
-`settings.json` is the one exception: it is deliberately **not** stowed, because
-it holds machine-specific values. That also makes it the one file where the repo
-and your machine drift apart silently. Run `./verify-drift.sh` to see by how
-much.
+`settings.json` is the one that breaks. `install.sh` *does* stow it — but Claude
+Code and its tools (`/config`, `/doctor`, `/permissions`, the desktop app) save
+it by writing a new file and renaming it over the old one. That replaces the
+symlink with a regular file. From then on the repo copy is a stale snapshot and
+nothing tells you.
+
+Directories are immune: a tool writing a file *inside* a symlinked directory
+does its rename inside the repo. That is why `agents/`, `skills/`, `rules/` and
+`hooks/` keep working. Single-file symlinks — `settings.json`, and in principle
+`CLAUDE.md` and `statusline.sh` — survive only for as long as nothing rewrites
+them that way.
+
+Run `./verify-drift.sh` to see whether your links survive and how far the copies
+have drifted.
 
 ## Setup
 
