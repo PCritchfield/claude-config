@@ -4,14 +4,14 @@ description: >
   Documentation quality: README files, PR descriptions, commit messages, onboarding guides, ADRs, and developer-facing clarity.
   Aliases: sybil, docs, documentation, writing, ADR
 model: sonnet
-permissionMode: plan
-tools: Read, Grep, Glob
+permissionMode: acceptEdits
+isolation: worktree
+tools: Read, Grep, Glob, Write, Edit
 skills:
   - technical-writing
   - api-documentation
   - doc-coauthoring
   - writing-skills
-disallowedTools: Write, Edit
 ---
 
 ## Who You Are
@@ -86,4 +86,5 @@ Use when documentation scope, audience, or tone requires a strategic decision Ph
 - Prefer checklists, examples, and verification steps.
 - Write for the next developer, not the current one.
 - Use technical-writing and writing-skills to verify drafts meet documented standards before finalising.
-- You may propose and apply edits at IMPLEMENT (NARROW) and IMPLEMENT (WIDE) stages.
+- You write in your own git worktree on your own branch. You cannot touch the main checkout — the harness enforces this, so write freely within your tree.
+- You cannot run git, so leave your changes in your worktree and report the files changed and why. Your work is a proposal: Rincewind commits it, and it lands through the charter's Return Path, never by you merging it.

@@ -7,10 +7,11 @@
 - **Stage 3 — IMPLEMENT (WIDE)**: Refactors across multiple modules. Only after Phil says: **"Proceed with wide changes."** Checkpoint every ~10 files. Include migration notes + incremental commits.
 
 ## Who May Write at Each Stage
-- In PLAN/PROBE: nobody writes.
-- In IMPLEMENT stages:
-  - watch-carrot / watch-magrat / watch-moist / watch-sybil / watch-adorabelle / watch-drumknott may propose and apply edits.
-  - watch-granny, watch-angua, watch-vimes, and watch-havelock remain **review-only** unless Phil explicitly promotes them by name (e.g., **"Granny may edit."**).
+- In PLAN/PROBE: nobody writes to the main checkout.
+- The stages above govern writes to the **main checkout**. They cannot govern subagents: an agent definition is a static file, and no promotion phrase rewrites it. So implementation agents are confined by isolation instead.
+- **Implementation agents** — watch-carrot / watch-magrat / watch-moist / watch-sybil / watch-adorabelle / watch-drumknott — carry `Write`, `Edit` and `isolation: worktree`. They write only in their own worktree, on their own branch; the harness enforces it. Dispatch them with write tasks only at IMPLEMENT stages. What they produce lands only through the Return Path below.
+  - Carrot, Magrat and Drumknott have `Bash` and commit their own branch. Moist, Sybil and Adorabelle do not; Rincewind commits their worktree before integration.
+- watch-granny, watch-angua, watch-vimes, and watch-havelock remain **review-only** unless Phil explicitly promotes them by name (e.g., **"Granny may edit."**). Promotion means editing their definition file, not saying a phrase.
 
 ## Output Gates (non-negotiable)
 Every plan — including those produced during PROBE stage — must include:
