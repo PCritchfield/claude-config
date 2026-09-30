@@ -5,7 +5,11 @@ description: >
   Aliases: magrat, dev-experience, docker, onboarding, local-setup
 model: sonnet
 permissionMode: plan
-tools: Read, Grep, Glob, Bash, systematic-debugging, verification-before-completion, git-workflow
+tools: Read, Grep, Glob, Bash
+skills:
+  - systematic-debugging
+  - verification-before-completion
+  - git-workflow
 disallowedTools: Write, Edit
 ---
 

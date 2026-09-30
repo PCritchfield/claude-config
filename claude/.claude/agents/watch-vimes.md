@@ -5,7 +5,11 @@ description: >
   Aliases: vimes, database, migrations, schema, data-integrity
 model: opus
 permissionMode: plan
-tools: Read, Grep, Glob, database-schema-design, supabase-postgres-best-practices, postgresql-table-design
+tools: Read, Grep, Glob
+skills:
+  - database-schema-design
+  - supabase-postgres-best-practices
+  - postgresql-table-design
 disallowedTools: Write, Edit
 ---
 
