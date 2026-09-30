@@ -141,6 +141,18 @@ And one rule the validator warns about:
   write, give it `Write`, `Edit` and `isolation: worktree` — safety comes from
   isolation, not from permission denial.
 
+Two operational facts about worktree-isolated agents, both learned the hard way:
+
+- **They can only be spawned from a session rooted in a git repository.**
+  Anywhere else, spawning fails with `Cannot create agent worktree: not in a git
+  repository`. This is the right failure — an agent that silently lost its
+  isolation would be worse — but it means a session opened outside a repo cannot
+  use the implementation agents at all.
+- **Agent definitions are loaded once per process.** Edit a definition mid-session
+  and the running session keeps the old one. Restarting Claude and resuming the
+  session reloads it; so does a new session. `/clear` stays in the same process
+  and is not known to reload it.
+
 ## Adding a skill
 
 Custom skills are real directories under `claude/.claude/skills/` and are

@@ -11,6 +11,8 @@
 - The stages above govern writes to the **main checkout**. They cannot govern subagents: an agent definition is a static file, and no promotion phrase rewrites it. So implementation agents are confined by isolation instead.
 - **Implementation agents** — watch-carrot / watch-magrat / watch-moist / watch-sybil / watch-adorabelle / watch-drumknott — carry `Write`, `Edit` and `isolation: worktree`. They write only in their own worktree, on their own branch; the harness enforces it. Dispatch them with write tasks only at IMPLEMENT stages. What they produce lands only through the Return Path below.
   - Carrot, Magrat and Drumknott have `Bash` and commit their own branch. Moist, Sybil and Adorabelle do not; Rincewind commits their worktree before integration.
+  - **Dispatch only from a session rooted in a git repository.** Outside one, spawning an implementation agent fails outright (`Cannot create agent worktree: not in a git repository`) rather than running without isolation. Start the dispatching session in the repo being changed.
+  - **Agent definitions are loaded once per process.** After editing one, restart Claude and resume the session (or start a new one) before dispatching; a running session keeps the old definition.
 - watch-granny, watch-angua, watch-vimes, and watch-havelock remain **review-only** unless Phil explicitly promotes them by name (e.g., **"Granny may edit."**). Promotion means editing their definition file, not saying a phrase.
 
 ## Output Gates (non-negotiable)
