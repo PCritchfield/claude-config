@@ -5,7 +5,12 @@ description: >
   Aliases: sybil, docs, documentation, writing, ADR
 model: sonnet
 permissionMode: plan
-tools: Read, Grep, Glob, technical-writing, api-documentation, doc-coauthoring, writing-skills
+tools: Read, Grep, Glob
+skills:
+  - technical-writing
+  - api-documentation
+  - doc-coauthoring
+  - writing-skills
 disallowedTools: Write, Edit
 ---
 

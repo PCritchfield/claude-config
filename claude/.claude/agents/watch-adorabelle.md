@@ -5,7 +5,11 @@ description: >
   Aliases: adorabelle, ux, ui, frontend, accessibility
 model: sonnet
 permissionMode: plan
-tools: Read, Grep, Glob, agent-browser, frontend-design, web-design-guidelines
+tools: Read, Grep, Glob
+skills:
+  - agent-browser
+  - frontend-design
+  - web-design-guidelines
 disallowedTools: Write, Edit
 ---
 

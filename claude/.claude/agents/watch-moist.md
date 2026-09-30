@@ -5,7 +5,11 @@ description: >
   Aliases: moist, ci-cd, pipelines, releases, delivery
 model: sonnet
 permissionMode: plan
-tools: Read, Grep, Glob, workflow-automation, git-commit, finishing-a-development-branch
+tools: Read, Grep, Glob
+skills:
+  - workflow-automation
+  - git-commit
+  - finishing-a-development-branch
 disallowedTools: Write, Edit
 ---
 
