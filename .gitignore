@@ -58,3 +58,6 @@ claude/.claude/commands/SDD-*.md
 # Editor/tool configs (root-level only, not claude/.claude/ stow source)
 /.claude/
 /.windsurf/
+
+# Python bytecode, e.g. from importing the validator or sync script in tests.
+__pycache__/

@@ -32,8 +32,32 @@ does its rename inside the repo. That is why `agents/`, `skills/`, `rules/` and
 `CLAUDE.md` and `statusline.sh` — survive only for as long as nothing rewrites
 them that way.
 
-Run `./verify-drift.sh` to see whether your links survive and how far the copies
-have drifted.
+So `settings.json` is **not stowed**. It is listed in `claude/.stow-local-ignore`,
+and git does the syncing instead:
+
+| Direction | When | How |
+|---|---|---|
+| live → repo | every session end | `SessionEnd` hook runs `sync-settings.py capture` |
+| repo → live | after `git pull` | `.githooks/post-merge` runs `sync-settings.py apply --post-merge` |
+
+- **The live file is authoritative.** Edit `~/.claude/settings.json` (or use
+  `/config`), not the repo copy. Your change lands in `git status` at session end.
+- **Capture never commits.** You review the diff and commit when you choose.
+- **Keys are sorted on every write**, so a tool reordering keys no longer shows up
+  as a rewrite in `git diff`. Only real changes do.
+- **Capture refuses secrets.** Any env var whose name looks like a token, key or
+  password — or whose value looks like one — blocks the capture. This repo is public.
+- **Apply refuses to clobber.** After a pull it acts only if `settings.json`
+  changed, and if this machine has live changes that were never captured, it
+  stops and tells you instead of overwriting them. It always backs up first.
+
+Run `./verify-drift.sh` to confirm every link is intact and `settings.json` is in
+sync.
+
+Known limit: hook commands with absolute paths (`~/.config/iterm2/cc-status`, the
+herdr hook) are machine-specific but are synced verbatim. On a machine without
+those scripts they will fail harmlessly. A machine-local overlay would fix this,
+but user-level `settings.local.json` support is unconfirmed, so it is not relied on.
 
 ## Setup
 
