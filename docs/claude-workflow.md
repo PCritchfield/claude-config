@@ -1,144 +1,75 @@
 # claude-workflow with the Watch Council
 
-[claude-workflow](https://github.com/liatrio-labs/claude-workflow) is a Claude Code
-plugin for spec-driven delivery: `cw-spec` → `cw-plan` → `cw-dispatch` →
-`cw-validate` → `cw-review`, with implementer, verifier and reviewer agents and a
-shared task board. This repo enables it (`settings.json`, `enabledPlugins`) and
-carries one local fix that makes it compatible with the council's worktree agents.
+claude-workflow is an **internal Liatrio** Claude Code plugin for spec-driven
+delivery (spec → plan → dispatch → validate → review). This repo enables it in
+`settings.json`. Its source is not public and is not reproduced here; this
+document covers only how it is used alongside the council and the operational
+lessons learned.
 
-Status: **under evaluation.** Phil is trialling it to see how it changes day-to-day
-work. Nothing here is a final architecture decision.
+Status: **under evaluation.** Nothing here is a final architecture decision.
 
 ## How the two fit
 
-They overlap less than they appear to:
+Working hypothesis: **claude-workflow orchestrates; the council supplies
+expertise.** The council's lasting value is domain doctrine (security, data,
+IaC, architecture), the veto order, Rincewind as operator, and CI as the gate.
 
-| | claude-workflow | Watch Council |
-|---|---|---|
-| Strength | Orchestration: planning, parallel dispatch, proof verification, task board | Domain doctrine and governance: security, data, IaC, architecture rules; veto order; Rincewind as operator |
-| Isolation | `/cw-worktree` creates and provisions worktrees itself | Six implementation agents carry `isolation: worktree` |
-| Review | `proof-verifier` re-runs proofs rather than trusting the implementer | Charter Return Path: zero-context review before merge |
+Today the seam is the diff: claude-workflow runs its pipeline, then the council's
+veto holders review the result through `/review` before merge. Deeper integration
+depends on moving council doctrine into skills (phase 06).
 
-The working hypothesis is a split by layer: claude-workflow orchestrates; the council supplies expertise as skills its
-implementers and reviewers load, and the veto holders review what it produces.
-That is a hypothesis to test, not a plan to execute.
+## The worktree hook problem
 
-## Setup on a new machine
+Any plugin that registers a `WorktreeCreate` hook **replaces** Claude Code's own
+worktree creation for every isolated agent — it cannot defer back to the default.
+claude-workflow 4.4.1's hook is incompatible with the payload Claude Code sends
+([documented here](https://code.claude.com/docs/en/hooks#worktreecreate-input):
+the slug arrives as `name`), so with the plugin enabled every agent with
+`isolation: worktree` — all six council writers — fails before starting.
 
-`install.sh` handles all of it:
+A real payload, captured 2026-10-07, contained only `cwd`, `hook_event_name`,
+`name`, `prompt_id`, `scratchpad_dir`, `session_id` and `transcript_path`.
+**No `agent_id`**, despite the docs listing it as a common field: the hook fires
+in the parent's context. The only signal that a worktree belongs to a subagent
+is Claude Code's `agent-<hex>` slug — observed, not documented.
 
-1. `settings.json` is synced from this repo, which enables the plugin and registers
-   its marketplace (`extraKnownMarketplaces.claude-workflow`).
-2. On next start, Claude Code installs the plugin into `~/.claude/plugins/cache/`
-   (or asks to, depending on marketplace trust settings — not verified on a clean machine).
-3. `scripts/apply-local-patches.sh` applies the local fix below.
+### The local fix
 
-Because step 2 happens at Claude Code startup, a brand-new machine needs
-`install.sh` run **again after the first launch** for step 3 to find the plugin.
-`./verify-drift.sh` reports whether the patch is in place.
-
-## The local patch: WorktreeCreate hook
-
-### The problem
-
-claude-workflow registers a `WorktreeCreate` hook. Any such hook **replaces**
-Claude Code's own `git worktree` creation for every worktree it makes — including
-every agent with `isolation: worktree`. It cannot defer back to the default: it
-must create the worktree and print its path, or creation fails.
-
-The 4.4.1 handler reads payload fields Claude Code does not send:
-
-| The handler reads | Claude Code sends ([docs](https://code.claude.com/docs/en/hooks#worktreecreate-input)) |
-|---|---|
-| `worktree_name` (required) | `name` |
-| `isolation_type` — to choose minimal vs full provisioning | nothing |
-| `base_ref` | nothing (the handler defaults to `HEAD`, which is fine) |
-
-So with the plugin enabled, **every isolated agent failed** before starting:
-`worktree_name is required in the hook payload`. And with only the name fixed,
-every subagent would have been provisioned in *full* mode — writing a
-`settings.local.json` with a task-list id into its worktree, which the plugin's
-own comments say pollutes the task board.
-
-### The fix
-
-`patches/claude-workflow-4.4.1-worktree-create.patch`, 21 lines:
-
-- read `.worktree_name // .name`
-- detect a subagent by `agent_id` if present, otherwise by Claude Code's
-  `agent-<hex>` worktree slug, and provision it in minimal mode
-
-### What the payload actually contains
-
-A real subagent payload, captured 2026-10-07:
-
-```
-cwd, hook_event_name, name, prompt_id, scratchpad_dir, session_id, transcript_path
-```
-
-**No `agent_id`**, even though the docs list it as a common field "to distinguish
-subagent hook calls from main-thread calls". The hook fires in the parent's
-context, before the subagent exists. The `agent-<hex>` slug is therefore the only
-working signal — and it is observed behaviour, not documented. If Claude Code
-changes its naming, subagents will quietly fall back to full provisioning. They
-will still work; they will just get set up as if they were a user worktree.
-
-### Why it is local, not upstream
-
-It fixes this environment so the plugin can be evaluated. It is not a change
-proposed to claude-workflow. (The bug does affect anyone using the plugin with
-`claude --worktree`, background sessions, or isolated agents — that is worth an
-upstream issue if the evaluation continues.)
-
-### Keeping it applied
-
-Plugin updates replace the cache and silently undo the patch.
+A small local patch to the plugin's hook makes it compatible. Because it contains
+lines of the plugin's internal source, it is **kept outside this public repo**,
+at `~/.claude/local-patches/claude-workflow-4.4.1-worktree-create.patch`
+(override with `CLAUDE_LOCAL_PATCHES`). It is a fix for this environment, not
+an upstream change.
 
 ```bash
-scripts/apply-local-patches.sh          # re-apply if needed (idempotent)
-scripts/apply-local-patches.sh --check  # report only; exit 1 if unpatched
-./verify-drift.sh                       # includes the check above
+scripts/apply-local-patches.sh          # re-apply after a plugin update (idempotent)
+scripts/apply-local-patches.sh --check  # report only
+./verify-drift.sh                       # includes the check
 ```
 
-The script applies the patch **only to version 4.4.1**. On any other version it
-reports whether the handler still reads `.worktree_name`:
-
-- if not, the bug is fixed upstream and the patch is no longer needed
-- if so, the patch must be re-derived for that version — it is never applied by
-  guesswork. Diff the new handler against the 4.4.1 original, carry the same two
-  changes across, and save it as `patches/claude-workflow-<version>-worktree-create.patch`
+It applies only to the version it was written for; other versions are reported,
+never patched by guesswork. A new machine needs the patch file copied into place
+manually before `install.sh` can apply it.
 
 ## Known side effect: agent worktrees are not cleaned up
 
-With Claude Code's default worktree creation, a subagent's worktree is removed
-automatically when it finishes with no changes. claude-workflow's
-`WorktreeRemove` hook is, in its own words, *observability-only* — it never
-removes anything. So every isolated agent run leaves a worktree and a
-`feature/agent-<hex>` branch behind, clean or not.
-
-Periodically, in each repo you dispatch from:
+With the plugin's hook in charge, a finished agent's worktree and its branch are
+not removed automatically. Periodically, in each repo you dispatch from:
 
 ```bash
 git worktree list
-git worktree remove .claude/worktrees/<dir>   # for each finished agent
+git worktree remove .claude/worktrees/<dir>
 git branch -D feature/agent-<hex>
 ```
 
 ## Operational rules (from the charter)
 
-- **Dispatch only from a session rooted in a git repository.** Elsewhere, spawning
-  an isolated agent fails outright rather than running without isolation.
-- **Agent definitions load once per process.** After editing one, restart Claude and
-  resume the session before dispatching. The *hook script*, by contrast, is read on
-  every call — patching it takes effect without a restart.
+- **Dispatch only from a session rooted in a git repository.**
+- **Agent definitions load once per process** — restart and resume after editing
+  one. A hook *script* is re-read on every call and needs no restart.
 
 ## Machine-local plugins
 
-Not every plugin belongs in the shared config. Paths listed in
-`~/.claude/sync-settings.exclude` (outside this repo) are never captured into
-`settings.json` and never removed by a pull. This machine excludes the Vercel
-plugin that way:
-
-```
-enabledPlugins/vercel@claude-plugins-official
-```
+Paths in `~/.claude/sync-settings.exclude` (outside this repo) are never captured
+into `settings.json` and never removed by a pull. This machine keeps the Vercel
+plugin local that way: `enabledPlugins/vercel@claude-plugins-official`.

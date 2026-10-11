@@ -31,10 +31,18 @@ STATUS=0
 # ---------------------------------------------------------------------------
 cw_patch() {
   local patch_version="4.4.1"
-  local patch="$REPO_DIR/patches/claude-workflow-$patch_version-worktree-create.patch"
+  # The patch is kept OUTSIDE this public repo: it contains lines of an internal
+  # plugin's source. Default location ~/.claude/local-patches/, overridable.
+  local patch="${CLAUDE_LOCAL_PATCHES:-$HOME/.claude/local-patches}/claude-workflow-$patch_version-worktree-create.patch"
   local root="$CACHE/claude-workflow/claude-workflow"
 
   [ -d "$root" ] || return 0   # plugin not installed: nothing to do
+  if [ ! -f "$patch" ]; then
+    echo "  WARN     claude-workflow installed but no local patch at $patch"
+    echo "           isolated agents will fail; see docs/claude-workflow.md"
+    STATUS=1
+    return 0
+  fi
 
   local dir version handler
   for dir in "$root"/*/; do
