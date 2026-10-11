@@ -22,6 +22,12 @@ Why this exists
   in a line diff. That exact misreading caused a false alarm about deleted
   permission rules on 2026-09-23.
 
+Machine-local keys
+  Paths listed in ~/.claude/sync-settings.exclude (outside the repo) never
+  sync: capture strips them before writing the repo copy, apply carries this
+  machine's values over so they are never deleted, check ignores them. Use it
+  for plugins or settings one machine wants and the shared config should not.
+
 Safety
   capture  Refuses if any env var looks secret. This repo is public; a
            captured file is one `git add` away from publishing it.
@@ -38,6 +44,7 @@ Location
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
@@ -52,6 +59,7 @@ REPO_REL = "claude/.claude/settings.json"
 REPO_SETTINGS = REPO / REPO_REL
 LIVE = Path.home() / ".claude" / "settings.json"
 BACKUPS = Path.home() / ".claude" / "backups"
+EXCLUDE = Path.home() / ".claude" / "sync-settings.exclude"
 
 SECRET_NAME = re.compile(
     r"token|secret|passw(or)?d|credential|api[_-]?key|private[_-]?key|access[_-]?key",
@@ -66,6 +74,61 @@ def normalize(obj) -> str:
 
 def load(path: Path):
     return json.loads(path.read_text())
+
+
+def load_excludes() -> list[tuple[str, ...]]:
+    """Machine-local keys that never sync, from ~/.claude/sync-settings.exclude.
+
+    One path per line, segments separated by '/', e.g.
+        enabledPlugins/vercel@claude-plugins-official
+    '/' rather than '.' because plugin and marketplace names can contain dots.
+    The file lives outside the repo on purpose: it is this machine's business.
+    """
+    if not EXCLUDE.exists():
+        return []
+    paths = []
+    for line in EXCLUDE.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            paths.append(tuple(line.split("/")))
+    return paths
+
+
+def strip_local(obj, excludes):
+    """Copy of obj with every excluded key removed. Empty parents are dropped."""
+    obj = copy.deepcopy(obj)
+    for path in excludes:
+        node, parents = obj, []
+        for key in path[:-1]:
+            if not isinstance(node, dict) or key not in node:
+                break
+            parents.append((node, key))
+            node = node[key]
+        else:
+            if isinstance(node, dict):
+                node.pop(path[-1], None)
+                for parent, key in reversed(parents):
+                    if parent[key] == {}:
+                        del parent[key]
+    return obj
+
+
+def graft_local(target, live, excludes):
+    """Copy of target with each excluded key carried over from live, so applying
+    the repo version never deletes a machine-local setting."""
+    target = copy.deepcopy(target)
+    for path in excludes:
+        src = live
+        for key in path:
+            if not isinstance(src, dict) or key not in src:
+                break
+            src = src[key]
+        else:
+            node = target
+            for key in path[:-1]:
+                node = node.setdefault(key, {})
+            node[path[-1]] = copy.deepcopy(src)
+    return target
 
 
 def git(*args: str) -> subprocess.CompletedProcess:
@@ -123,7 +186,7 @@ def cmd_capture(_args) -> int:
     if not LIVE.exists():
         print("sync-settings: no live settings.json to capture", file=sys.stderr)
         return 1
-    live = load(LIVE)
+    live = strip_local(load(LIVE), load_excludes())
 
     secrets = find_secrets(live)
     if secrets:
@@ -152,7 +215,9 @@ def cmd_capture(_args) -> int:
 
 
 def cmd_apply(args) -> int:
-    live = load(LIVE) if LIVE.exists() else None
+    excludes = load_excludes()
+    raw_live = load(LIVE) if LIVE.exists() else None
+    live = strip_local(raw_live, excludes) if raw_live is not None else None
 
     if args.post_merge:
         before, after = repo_version("ORIG_HEAD"), repo_version("HEAD")
@@ -175,6 +240,8 @@ def cmd_apply(args) -> int:
         if live is not None and normalize(live) == normalize(target):
             return 0
 
+    if raw_live is not None:
+        target = graft_local(target, raw_live, excludes)
     saved = backup_live()
     write_live(target)
     note = f" (previous copy: {saved})" if saved else ""
@@ -185,7 +252,8 @@ def cmd_apply(args) -> int:
 def cmd_check(_args) -> int:
     if not (LIVE.exists() and REPO_SETTINGS.exists()):
         return 1
-    return 0 if normalize(load(LIVE)) == normalize(load(REPO_SETTINGS)) else 1
+    live = strip_local(load(LIVE), load_excludes())
+    return 0 if normalize(live) == normalize(load(REPO_SETTINGS)) else 1
 
 
 def main() -> int:
