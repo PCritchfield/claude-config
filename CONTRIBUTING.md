@@ -51,6 +51,11 @@ and git does the syncing instead:
   changed, and if this machine has live changes that were never captured, it
   stops and tells you instead of overwriting them. It always backs up first.
 
+Some settings belong to one machine only — a plugin you are trying out, say.
+List their paths in `~/.claude/sync-settings.exclude` (outside the repo, one
+`/`-separated path per line, e.g. `enabledPlugins/vercel@claude-plugins-official`).
+Capture strips them, a pull never removes them, and the drift check ignores them.
+
 Run `./verify-drift.sh` to confirm every link is intact and `settings.json` is in
 sync.
 
@@ -148,6 +153,11 @@ Two operational facts about worktree-isolated agents, both learned the hard way:
   repository`. This is the right failure — an agent that silently lost its
   isolation would be worse — but it means a session opened outside a repo cannot
   use the implementation agents at all.
+- **Any plugin that registers a `WorktreeCreate` hook takes over worktree
+  creation for every isolated agent.** It replaces Claude Code's default and
+  cannot defer to it. If that hook is broken, all six implementation agents fail.
+  This happened with claude-workflow 4.4.1 — see
+  [docs/claude-workflow.md](docs/claude-workflow.md).
 - **Agent definitions are loaded once per process.** Edit a definition mid-session
   and the running session keeps the old one. Restarting Claude and resuming the
   session reloads it; so does a new session. `/clear` stays in the same process
