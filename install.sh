@@ -86,6 +86,11 @@ fi
 # machine into ~/.claude. Guarded — see sync-settings.py.
 git -C "$REPO_DIR" config core.hooksPath .githooks
 
+# Local plugin patches. Plugin updates overwrite the plugin cache, so these are
+# re-applied here. Non-fatal: a missing plugin is fine, and a version the patch
+# was not written for is reported, not guessed at. See docs/claude-workflow.md.
+"$REPO_DIR/scripts/apply-local-patches.sh" || echo "  (see docs/claude-workflow.md)"
+
 echo ""
 echo "Done. Managed items in ~/.claude are now symlinked from this repo."
 echo "Symlinked: ${MANAGED_ITEMS[*]}"
