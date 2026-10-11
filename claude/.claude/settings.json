@@ -4,11 +4,20 @@
   "autoDreamEnabled": true,
   "autoMemoryEnabled": true,
   "enabledPlugins": {
+    "claude-workflow@claude-workflow": true,
     "superpowers@claude-plugins-official": true
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "OBSIDIAN_VAULT": "/Users/philc/Documents/obsidian/Vault"
+  },
+  "extraKnownMarketplaces": {
+    "claude-workflow": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/liatrio-labs/claude-workflow.git"
+      }
+    }
   },
   "hooks": {
     "Notification": [
