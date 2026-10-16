@@ -28,7 +28,7 @@ Default to the current repo root:
 git rev-parse --show-toplevel 2>/dev/null || echo "no-repo"
 ```
 
-If the user named a different path, use that. If no repo is detected and none was given, ask for a path and stop.
+The target must be this session's repo, because `crew:coder`'s worktree (Step 2) is made from it. If the user named a different path, ask them to run the skill from that repo and stop. If no repo is detected, say so and stop.
 
 Record which **seam-awareness cascade rungs** the repo actually has — this calibrates confidence:
 
@@ -46,13 +46,14 @@ grep -rIl -E '(//|#) ?seam:' "$ROOT" --include='*.*' 2>/dev/null | head   # rung
 
 ## Step 2 — Dispatch crew:architecture and crew:coder in parallel (read-only)
 
-Send both agents, in a single message, the **identical prompt** below (substitute the repo path). Both are read-only — they must not edit, write, or run state-mutating commands. Dispatch both with `isolation: "worktree"`: `crew:coder` can write, so a stray edit lands in a throwaway worktree, not the user's checkout. The worktree holds `HEAD` only, so run this from the target repo and note in the report that uncommitted changes were not audited. Crew agents carry no over-engineering lens of their own, so this prompt carries all of it, and its output format replaces theirs.
+Send both agents, in a single message, the **identical prompt** below (substitute the repo path). Both are read-only — they must not edit, write, or run state-mutating commands. Dispatch `crew:coder` with `isolation: "worktree"`: it can write, so a stray edit lands in a throwaway worktree, not the user's checkout. That worktree holds `HEAD` only. `crew:architecture` has no write tools, so it reads `<REPO_ROOT>` directly, with no isolation. Crew agents carry no over-engineering lens of their own, so this prompt carries all of it, and its output format replaces theirs.
 
 ```
 Whole-repo over-engineering audit. This is not a diff review: this prompt's OUTPUT
 section replaces your usual Findings and VERDICT format. Do not return BLOCK.
 
-READ-ONLY over-engineering audit of your working copy (a worktree of <REPO_ROOT>). Produce findings only —
+READ-ONLY over-engineering audit of the repo at <REPO_ROOT> (if you were given a worktree,
+audit your worktree: it is that repo at HEAD). Produce findings only —
 do NOT edit or write files, and do not run any state-mutating command. Read/grep/glob only.
 
 THE LADDER. For any code, ask in order; it is over-engineered if it lands lower than it
@@ -101,6 +102,7 @@ Merge the two agents' output into one report:
 2. **Protected seams** — the union of what both agents protected, each with its cascade rung. This is the safety audit trail; never drop it.
 3. **Conclusion** — combined estimate of net lines removable + dependencies droppable. If both said "Lean already. Ship.", say exactly that.
 4. **Cascade coverage** — which rungs the repo had (from Step 1), and — if bare — the explicit caveat that single-impl abstractions were held at INFO.
+5. **Uncommitted work** — if `git status --porcelain` was not empty, say that `crew:coder` audited `HEAD` only, so its findings do not cover uncommitted changes.
 
 Present findings only. **This skill does not apply fixes.** If the user wants cuts applied, that is a separate, promoted implementation step (dispatch `crew:coder` in Build mode with `isolation: "worktree"`; `crew:architecture` stays read-only).
 

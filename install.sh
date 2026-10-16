@@ -54,8 +54,10 @@ if [ ${#CONFLICTS[@]} -gt 0 ]; then
   echo "Backup complete."
 fi
 
-# Clean up stale symlinks into this package, including ones for items since
-# removed from it (for example the retired CLAUDE.md). A dangling link is not
+# Clean up dangling symlinks whose target path runs through a claude/.claude
+# package directory, including ones for items since removed from it (for
+# example the retired CLAUDE.md). Only links whose target is already gone are
+# removed. A dangling link is not
 # harmless: writing through it recreates the deleted file in the repo.
 for target_path in "$CLAUDE_DIR"/*; do
   [ -L "$target_path" ] && [ ! -e "$target_path" ] || continue
