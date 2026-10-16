@@ -82,6 +82,14 @@ for src in "$STOW_SRC"/*; do
   fi
 done
 
+# Orphans: dangling links into the repo for items no longer in it.
+for live in "$LIVE_DIR"/*; do
+  [ -L "$live" ] && [ ! -e "$live" ] || continue
+  case "$(readlink "$live")" in
+    */claude/.claude/*) bad "$(basename "$live") — dangling symlink into the repo (run ./install.sh)" ;;
+  esac
+done
+
 # ---------------------------------------------------------------------------
 # 2. Un-stowed files: compare content directly
 # ---------------------------------------------------------------------------

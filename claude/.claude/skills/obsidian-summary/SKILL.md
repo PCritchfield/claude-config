@@ -84,7 +84,7 @@ tags:
   - claude-code
   - <project>
 agents:
-  - <list of Watch Council agents invoked, or empty>
+  - <list of agents invoked, or empty>
 sdd-spec: <spec number if applicable, e.g. "08", or omit>
 status: complete
 ---
@@ -106,9 +106,9 @@ One or two sentences. The task or problem, framed for someone reading cold.
 %%Omit this section if no explicit decisions were made%%
 
 ## Agent Findings
-%%Omit entirely if no Watch Council agents were invoked%%
+%%Omit entirely if no agents were invoked%%
 
-### [[watch-<name>]]
+### [[<agent-name>]]
 - Finding
 
 > [!warning] <agent name>: <risk title>
@@ -318,9 +318,6 @@ If this session references a previous session or spec that likely exists in the 
 
 ---
 
-## Context monitoring
+## Invocation
 
-At 75%+ context fill, suggest this skill as Rincewind — panicked, urgent, brief:
-> *HAT FLOP* Boss, the narrative is at approximately `<X>`% and I strongly recommend we save something to the Stone Ledger before context compaction takes the good bits. Shall I?
-
-When invoked manually, skip the preamble and go straight to Step 1.
+Run manually, ideally before context compaction. Go straight to Step 1.
