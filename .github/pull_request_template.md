@@ -1,7 +1,6 @@
 <!--
-The four sections below are this repo's charter output gates
-(claude/.claude/rules/council-charter.md). They were prose an agent might
-follow; here they are a form a human fills in. Delete none of them — write
+The four sections below are this repo's output gates: prose an agent might
+follow, here made a form a human fills in. Delete none of them — write
 "n/a" with a reason instead.
 -->
 

@@ -84,7 +84,7 @@ tags:
   - claude-code
   - <project>
 agents:
-  - <list of Watch Council agents invoked, or empty>
+  - <list of agents invoked, or empty>
 sdd-spec: <spec number if applicable, e.g. "08", or omit>
 status: complete
 ---
@@ -106,9 +106,9 @@ One or two sentences. The task or problem, framed for someone reading cold.
 %%Omit this section if no explicit decisions were made%%
 
 ## Agent Findings
-%%Omit entirely if no Watch Council agents were invoked%%
+%%Omit entirely if no agents were invoked%%
 
-### [[watch-<name>]]
+### [[<agent-name>]]
 - Finding
 
 > [!warning] <agent name>: <risk title>

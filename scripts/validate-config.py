@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the Watch Council configuration as data.
+"""Validate the Claude Code configuration as data.
 
 Both defects found in the 2026-09 audit were statically detectable from this
 repo alone, and both survived four months because nothing asserted anything:

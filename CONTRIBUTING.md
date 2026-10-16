@@ -6,8 +6,8 @@ must keep practising what it documents.
 
 ## Read this first: the repo is your live config
 
-`install.sh` uses GNU stow, so `~/.claude/agents`, `skills`, `rules`, `hooks`,
-`CLAUDE.md` and `statusline.sh` are **symlinks into this working tree** — not
+`install.sh` uses GNU stow, so `~/.claude/agents`, `skills`, `rules`, `hooks`
+and `statusline.sh` are **symlinks into this working tree** — not
 copies, and not into git objects.
 
 Two consequences that surprise everyone once:
@@ -29,7 +29,7 @@ nothing tells you.
 Directories are immune: a tool writing a file *inside* a symlinked directory
 does its rename inside the repo. That is why `agents/`, `skills/`, `rules/` and
 `hooks/` keep working. Single-file symlinks — `settings.json`, and in principle
-`CLAUDE.md` and `statusline.sh` — survive only for as long as nothing rewrites
+`statusline.sh` — survive only for as long as nothing rewrites
 them that way.
 
 So `settings.json` is **not stowed**. It is listed in `claude/.stow-local-ignore`,
@@ -103,10 +103,9 @@ Regenerate deliberately, never casually: `scripts/validate-config.py --update-ba
 
 ## Output gates
 
-Every PR carries four sections, from
-[`rules/council-charter.md`](claude/.claude/rules/council-charter.md): **Verification**,
-**Rollback**, **Risks and assumptions**, **Scope control**. The PR template
-prompts for all four. Write "n/a" with a reason rather than deleting one.
+Every PR carries four sections: **Verification**, **Rollback**,
+**Risks and assumptions**, **Scope control**. The PR template prompts for all
+four. Write "n/a" with a reason rather than deleting one.
 
 An honest "verification did not complete, here is what remains" is worth more
 than an implied pass. Two of the three defects that motivated this CI survived
@@ -114,11 +113,12 @@ four months precisely because documentation asserted things nobody checked.
 
 ## Adding an agent
 
-Agent definitions live in `claude/.claude/agents/`. Frontmatter:
+The agents now come from the crew plugin, so `claude/.claude/agents/` is empty.
+A local agent added there is still checked by the validator. Frontmatter:
 
 ```yaml
 ---
-name: watch-example          # must match the filename
+name: example-agent          # must match the filename
 description: >
   One or two sentences on what this agent is for.
   Aliases: example, thing

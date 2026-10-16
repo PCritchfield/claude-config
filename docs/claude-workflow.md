@@ -1,22 +1,23 @@
-# claude-workflow with the Watch Council
+# claude-workflow with the crew
 
 claude-workflow is an **internal Liatrio** Claude Code plugin for spec-driven
 delivery (spec → plan → dispatch → validate → review). This repo enables it in
 `settings.json`. Its source is not public and is not reproduced here; this
-document covers only how it is used alongside the council and the operational
+document covers only how it is used alongside the crew plugin and the operational
 lessons learned.
 
 Status: **under evaluation.** Nothing here is a final architecture decision.
 
 ## How the two fit
 
-Working hypothesis: **claude-workflow orchestrates; the council supplies
-expertise.** The council's lasting value is domain doctrine (security, data,
-IaC, architecture), the veto order, Rincewind as operator, and CI as the gate.
+Working hypothesis: **claude-workflow orchestrates; the crew plugin supplies
+expertise.** The crew's lasting value is domain doctrine (security, data, IaC,
+architecture) in its read-only guardians, Rincewind as operator, and CI as the
+gate.
 
-Today the seam is the diff: claude-workflow runs its pipeline, then the council's
-veto holders review the result through `/review` before merge. Deeper integration
-depends on moving council doctrine into skills (phase 06).
+Today the seam is the diff: claude-workflow runs its pipeline, then
+`crew:review` runs the guardians over the result before merge. Any guardian can
+return BLOCK.
 
 ## The worktree hook problem
 
@@ -25,7 +26,8 @@ worktree creation for every isolated agent — it cannot defer back to the defau
 claude-workflow 4.4.1's hook is incompatible with the payload Claude Code sends
 ([documented here](https://code.claude.com/docs/en/hooks#worktreecreate-input):
 the slug arrives as `name`), so with the plugin enabled every agent with
-`isolation: worktree` — all six council writers — fails before starting.
+`isolation: worktree` fails before starting. That includes every crew builder,
+since crew routing dispatches them all with `isolation: "worktree"`.
 
 A real payload, captured 2026-10-07, contained only `cwd`, `hook_event_name`,
 `name`, `prompt_id`, `scratchpad_dir`, `session_id` and `transcript_path`.
@@ -62,7 +64,7 @@ git worktree remove .claude/worktrees/<dir>
 git branch -D feature/agent-<hex>
 ```
 
-## Operational rules (from the charter)
+## Operational rules
 
 - **Dispatch only from a session rooted in a git repository.**
 - **Agent definitions load once per process** — restart and resume after editing

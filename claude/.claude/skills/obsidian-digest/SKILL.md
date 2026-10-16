@@ -175,7 +175,7 @@ status: complete
 %%Omit for leadership and client-facing audiences%%
 %%Include for personal and team — one subsection per agent that had significant findings%%
 
-### [[watch-<n>]]
+### [[<agent-name>]]
 - Finding
 
 ## Diagrams

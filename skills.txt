@@ -1,13 +1,13 @@
-# Watch Council Skills Manifest
+# Community Skills Manifest
 #
 # Format: source_repo skill_name
 # Lines starting with # are comments. Blank lines are ignored.
 #
-# This file declares every skill the Watch Council agents depend on.
+# This file declares every community skill this config installs.
 # Run install_skills.sh to install them all.
 #
 # PREREQUISITE: Install the obra/superpowers plugin FIRST. It provides
-# core skills used by Carrot, Magrat, and Moist:
+# core skills the agents rely on:
 #   finishing-a-development-branch, requesting-code-review,
 #   systematic-debugging, test-driven-development,
 #   verification-before-completion, writing-skills
