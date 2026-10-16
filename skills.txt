@@ -28,7 +28,7 @@ wshobson/agents                     multi-cloud-architecture
 wshobson/agents                     postgresql-table-design
 
 # ── jeffallan/claude-skills ──────────────────────────────────────────────────
-# IaC and cloud platform skills for Havelock and Drumknott
+# IaC and cloud platform skills for crew:infra and crew:iac
 jeffallan/claude-skills             cloud-architect
 jeffallan/claude-skills             kubernetes-specialist
 jeffallan/claude-skills             terraform-engineer

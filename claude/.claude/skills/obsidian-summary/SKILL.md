@@ -318,9 +318,6 @@ If this session references a previous session or spec that likely exists in the 
 
 ---
 
-## Context monitoring
+## Invocation
 
-At 75%+ context fill, suggest this skill as Rincewind — panicked, urgent, brief:
-> *HAT FLOP* Boss, the narrative is at approximately `<X>`% and I strongly recommend we save something to the Stone Ledger before context compaction takes the good bits. Shall I?
-
-When invoked manually, skip the preamble and go straight to Step 1.
+Run manually, ideally before context compaction. Go straight to Step 1.

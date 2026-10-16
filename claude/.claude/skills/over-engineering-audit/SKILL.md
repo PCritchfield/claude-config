@@ -46,12 +46,13 @@ grep -rIl -E '(//|#) ?seam:' "$ROOT" --include='*.*' 2>/dev/null | head   # rung
 
 ## Step 2 — Dispatch crew:architecture and crew:coder in parallel (read-only)
 
-Send both agents, in a single message, the **identical prompt** below (substitute the repo path). Both are read-only — they must not edit, write, or run state-mutating commands. Crew agents carry no over-engineering lens of their own, so this prompt carries all of it. `crew:coder` needs no worktree here because it writes nothing.
+Send both agents, in a single message, the **identical prompt** below (substitute the repo path). Both are read-only — they must not edit, write, or run state-mutating commands. Dispatch both with `isolation: "worktree"`: `crew:coder` can write, so a stray edit lands in a throwaway worktree, not the user's checkout. The worktree holds `HEAD` only, so run this from the target repo and note in the report that uncommitted changes were not audited. Crew agents carry no over-engineering lens of their own, so this prompt carries all of it, and its output format replaces theirs.
 
 ```
-Mode: Review. There is no diff: the subject is the whole repo.
+Whole-repo over-engineering audit. This is not a diff review: this prompt's OUTPUT
+section replaces your usual Findings and VERDICT format. Do not return BLOCK.
 
-READ-ONLY over-engineering audit of the repo at <REPO_ROOT>. Produce findings only —
+READ-ONLY over-engineering audit of your working copy (a worktree of <REPO_ROOT>). Produce findings only —
 do NOT edit or write files, and do not run any state-mutating command. Read/grep/glob only.
 
 THE LADDER. For any code, ask in order; it is over-engineered if it lands lower than it
@@ -63,7 +64,8 @@ the minimum working code.
 LAZY, NOT NEGLIGENT. Never recommend removing trust-boundary validation, error handling,
 security checks, or accessibility, however redundant they look.
 
-MANDATORY FIRST STEP — run the seam-awareness cascade before flagging ANY abstraction:
+MANDATORY FIRST STEP — run the seam-awareness cascade before flagging ANY abstraction
+(Protocol, ABC, interface, wrapper, base class, single-implementation indirection):
   (a) ARCHITECTURE.md  (b) CLAUDE.md / AGENTS.md  (c) inline // seam: markers or
   "seam discipline" docstrings  (d) no evidence → report at INFO with "confirm intent",
   NEVER a confident delete:/yagni:. An abstraction documented at (a)/(b)/(c) is PROTECTED.
@@ -73,7 +75,10 @@ or performance here.
 
 OUTPUT:
 1. Ranked findings, biggest cut first, one line each:  <tag> <what to cut>. <replacement>. [file:line]
-   Tags: delete: / stdlib: / native: / yagni: / shrink:
+   Tags: delete: dead, unused or speculative code / stdlib: hand-rolled logic the standard
+   library covers / native: duplicates a platform or framework feature / yagni: speculative
+   single-implementation abstraction or unused config, ONLY after the cascade clears it /
+   shrink: duplicated logic that compresses. Rung (d) items are INFO with "confirm intent".
 2. A conclusion line: estimated net lines removable + dependencies droppable, or exactly
    "Lean already. Ship." if there is no removable overhead.
 3. A separate list of every abstraction you assessed and PROTECTED, with the cascade rung

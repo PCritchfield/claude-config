@@ -54,13 +54,17 @@ if [ ${#CONFLICTS[@]} -gt 0 ]; then
   echo "Backup complete."
 fi
 
-# Clean up stale symlinks from previous stow runs
-for item in "${MANAGED_ITEMS[@]}"; do
-  target_path="$CLAUDE_DIR/$item"
-  if [ -L "$target_path" ] && [ ! -e "$target_path" ]; then
-    echo "Removing stale symlink: $item"
-    rm "$target_path"
-  fi
+# Clean up stale symlinks into this package, including ones for items since
+# removed from it (for example the retired CLAUDE.md). A dangling link is not
+# harmless: writing through it recreates the deleted file in the repo.
+for target_path in "$CLAUDE_DIR"/*; do
+  [ -L "$target_path" ] && [ ! -e "$target_path" ] || continue
+  case "$(readlink "$target_path")" in
+    */"$STOW_PKG"/.claude/*)
+      echo "Removing stale symlink: $(basename "$target_path")"
+      rm "$target_path"
+      ;;
+  esac
 done
 
 # Ensure target directory exists

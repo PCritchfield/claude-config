@@ -51,7 +51,8 @@ scripts/apply-local-patches.sh --check  # report only
 
 It applies only to the version it was written for; other versions are reported,
 never patched by guesswork. A new machine needs the patch file copied into place
-manually before `install.sh` can apply it.
+manually before `install.sh` can apply it. Until it is, every crew builder fails
+to start on that machine, because crew dispatches builders with `isolation: "worktree"`.
 
 ## Known side effect: agent worktrees are not cleaned up
 

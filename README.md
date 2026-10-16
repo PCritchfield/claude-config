@@ -113,7 +113,7 @@ Superpowers drives the process. Install:
 /plugin marketplace add PCritchfield/claude-crew
 ```
 
-then install `crew@crew` from that marketplace.
+then install `crew@crew` from that marketplace. `settings.json` already declares the marketplace and enables `crew@crew`, so on a machine that pulls the synced settings this is only a fallback. The repo is private: the machine needs git access to GitHub as PCritchfield, for example through `gh auth login`.
 
 ## Hooks
 
