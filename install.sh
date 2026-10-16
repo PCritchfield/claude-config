@@ -57,8 +57,8 @@ fi
 # Clean up dangling symlinks whose target path runs through a claude/.claude
 # package directory, including ones for items since removed from it (for
 # example the retired CLAUDE.md). Only links whose target is already gone are
-# removed. A dangling link is not
-# harmless: writing through it recreates the deleted file in the repo.
+# removed. A dangling link is not harmless: writing through it recreates the
+# deleted file in the repo.
 for target_path in "$CLAUDE_DIR"/*; do
   [ -L "$target_path" ] && [ ! -e "$target_path" ] || continue
   case "$(readlink "$target_path")" in

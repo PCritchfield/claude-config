@@ -28,7 +28,9 @@ Default to the current repo root:
 git rev-parse --show-toplevel 2>/dev/null || echo "no-repo"
 ```
 
-The target must be this session's repo, because `crew:coder`'s worktree (Step 2) is made from it. If the user named a different path, ask them to run the skill from that repo and stop. If no repo is detected, say so and stop.
+The target must be this session's repo, because `crew:coder`'s worktree (Step 2) is made from it. A subdirectory of it is fine: pass it to both agents as the scope. If the user named a different repo, ask them to run the skill from that repo and stop. If no repo is detected, say so and stop.
+
+Check for uncommitted work with `git status --porcelain`. `crew:coder` sees `HEAD` only, while `crew:architecture` reads the working tree, so on a dirty tree they would audit different code. If the output is not empty, tell the user and offer to stop so they can commit or stash. Continue only if they say to, and record that they did.
 
 Record which **seam-awareness cascade rungs** the repo actually has — this calibrates confidence:
 
@@ -76,6 +78,7 @@ or performance here.
 
 OUTPUT:
 1. Ranked findings, biggest cut first, one line each:  <tag> <what to cut>. <replacement>. [file:line]
+   (paths relative to the repo root, never absolute worktree paths)
    Tags: delete: dead, unused or speculative code / stdlib: hand-rolled logic the standard
    library covers / native: duplicates a platform or framework feature / yagni: speculative
    single-implementation abstraction or unused config, ONLY after the cascade clears it /
@@ -102,7 +105,7 @@ Merge the two agents' output into one report:
 2. **Protected seams** — the union of what both agents protected, each with its cascade rung. This is the safety audit trail; never drop it.
 3. **Conclusion** — combined estimate of net lines removable + dependencies droppable. If both said "Lean already. Ship.", say exactly that.
 4. **Cascade coverage** — which rungs the repo had (from Step 1), and — if bare — the explicit caveat that single-impl abstractions were held at INFO.
-5. **Uncommitted work** — if `git status --porcelain` was not empty, say that `crew:coder` audited `HEAD` only, so its findings do not cover uncommitted changes.
+5. **Uncommitted work** — if Step 1 found a dirty tree and the user chose to continue, say that the two agents audited different revisions (`crew:coder` at `HEAD`, `crew:architecture` with uncommitted changes), so line numbers may not match across them.
 
 Present findings only. **This skill does not apply fixes.** If the user wants cuts applied, that is a separate, promoted implementation step (dispatch `crew:coder` in Build mode with `isolation: "worktree"`; `crew:architecture` stays read-only).
 
