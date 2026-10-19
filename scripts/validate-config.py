@@ -389,7 +389,9 @@ def main() -> int:
     reproduced = {k for k, _ in report.errors}
     fixed = sorted(baseline - reproduced)
 
-    print(f"agents: {len(sorted(AGENTS_DIR.glob('*.md')))}  "
+    agents = (len(list(AGENTS_DIR.glob('*.md'))) if AGENTS_DIR.is_dir()
+              else "none (checks skipped; the crew plugin supplies agents)")
+    print(f"agents: {agents}  "
           f"skills known: {len(skills)}\n")
 
     for key, message in hard:

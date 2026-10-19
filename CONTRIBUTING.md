@@ -1,23 +1,24 @@
 # Contributing
 
-This repo is a Claude Code configuration *and* the reference implementation of a
-method for building agent systems. Changes are welcome; the bar is that the repo
+This repo is a personal Claude Code configuration. The agents, persona and review
+workflow live in the [crew plugin](https://github.com/PCritchfield/claude-crew);
+this repo holds what surrounds it. Changes are welcome; the bar is that the repo
 must keep practising what it documents.
 
 ## Read this first: the repo is your live config
 
-`install.sh` uses GNU stow, so `~/.claude/agents`, `skills`, `rules`, `hooks`,
-`CLAUDE.md` and `statusline.sh` are **symlinks into this working tree** — not
+`install.sh` uses GNU stow, so `~/.claude/skills`, `rules`, `hooks` and
+`statusline.sh` are **symlinks into this working tree** — not
 copies, and not into git objects.
 
 Two consequences that surprise everyone once:
 
-1. **Editing a file here changes agent behaviour immediately.** No install step.
+1. **Editing a file here changes Claude's behaviour immediately.** No install step.
 2. **`git checkout`, `stash`, `rebase` and `bisect` rewrite your live config.**
-   Switching to a branch without a fix reverts that fix in the running agent.
+   Switching to a branch without a fix reverts that fix in the running session.
 
-If you are working on agent definitions, expect your Claude to change under you
-as you move between branches. That is the design, not a bug — but know it before
+If you are working on rules, skills or hooks, expect your Claude to change under
+you as you move between branches. That is the design, not a bug — but know it before
 you go looking for ghosts.
 
 `settings.json` is the one that breaks. `install.sh` *does* stow it — but Claude
@@ -27,9 +28,9 @@ symlink with a regular file. From then on the repo copy is a stale snapshot and
 nothing tells you.
 
 Directories are immune: a tool writing a file *inside* a symlinked directory
-does its rename inside the repo. That is why `agents/`, `skills/`, `rules/` and
-`hooks/` keep working. Single-file symlinks — `settings.json`, and in principle
-`CLAUDE.md` and `statusline.sh` — survive only for as long as nothing rewrites
+does its rename inside the repo. That is why `skills/`, `rules/` and `hooks/`
+keep working. Single-file symlinks — `settings.json`, and in principle
+`statusline.sh` — survive only for as long as nothing rewrites
 them that way.
 
 So `settings.json` is **not stowed**. It is listed in `claude/.stow-local-ignore`,

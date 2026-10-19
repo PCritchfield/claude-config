@@ -41,11 +41,7 @@ Each step is independent. Run what you need.
 
 Creates symlinks from `~/.claude/` pointing into the repo using [GNU Stow](https://www.gnu.org/software/stow/). Requires `stow`. The script backs up any pre-existing real files before replacing them with symlinks, seeds `settings.json` on a fresh machine, and installs the git hook that applies pulled settings.
 
-Machines stowed before the crew replaced the council have dangling links for items this repo no longer holds. Remove them once:
-
-```bash
-rm -f ~/.claude/CLAUDE.md ~/.claude/agents ~/.claude/commands
-```
+On machines stowed before the crew replaced the council, it also removes the retired `CLAUDE.md`, `agents` and `commands` links, and names any leftover domain-skill links in `skills/` for you to delete.
 
 ### Step 2: Plugins
 

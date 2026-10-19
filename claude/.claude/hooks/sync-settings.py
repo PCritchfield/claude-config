@@ -27,8 +27,9 @@ Machine-local keys
   network for auto mode's classifier, and Claude Code reads it only from the
   user settings file. Paths listed in ~/.claude/sync-settings.exclude (outside
   the repo) are machine-local too. None of them sync: capture strips them
-  before writing the repo copy, apply carries this machine's values over so
-  they are never deleted, check ignores them. Use the exclude file for plugins
+  before writing the repo copy, apply ignores the repo's values and carries
+  this machine's over so they are never deleted or replaced, check ignores
+  them. Use the exclude file for plugins
   or settings one machine wants and the shared config should not.
 
 Safety
@@ -226,7 +227,10 @@ def cmd_apply(args) -> int:
     live = strip_local(raw_live, excludes) if raw_live is not None else None
 
     if args.post_merge:
-        before, after = repo_version("ORIG_HEAD"), repo_version("HEAD")
+        # Strip machine-local keys from the repo side too, so a commit can never
+        # install them on this machine (an autoMode block grants permissions).
+        before, after = (strip_local(v, excludes) if v is not None else None
+                         for v in (repo_version("ORIG_HEAD"), repo_version("HEAD")))
         if after is None or normalize(before) == normalize(after):
             return 0
         if live is not None and normalize(live) == normalize(after):
@@ -242,7 +246,7 @@ def cmd_apply(args) -> int:
         if not REPO_SETTINGS.exists():
             print(f"sync-settings: no {REPO_REL} in the repo", file=sys.stderr)
             return 1
-        target = load(REPO_SETTINGS)
+        target = strip_local(load(REPO_SETTINGS), excludes)
         if live is not None and normalize(live) == normalize(target):
             return 0
 

@@ -33,6 +33,6 @@ claude/.claude/skills/git-commit-conventional
 # Python bytecode, e.g. from importing the validator or sync script in tests.
 __pycache__/
 
-# Tool-managed entries (omarchy skill symlink, herdr hook)
-claude/.claude/skills/omarchy
+# Installed by herdr into ~/.claude/hooks (this working tree, through stow) and
+# overwritten on every herdr update.
 claude/.claude/hooks/herdr-agent-state.sh

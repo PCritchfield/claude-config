@@ -47,6 +47,32 @@ class AutoModeIsAlwaysLocal(unittest.TestCase):
         self.assertEqual(json.loads(self.mod.LIVE.read_text()),
                          {"effortLevel": "high", "autoMode": {"environment": ["mine"]}})
 
+    def test_apply_never_imports_repo_automode(self):
+        self.mod.LIVE.write_text(json.dumps({"effortLevel": "low"}))
+        self.mod.REPO_SETTINGS.write_text(json.dumps({"effortLevel": "high",
+                                                      "autoMode": {"allow": ["anything"]}}))
+        self.mod.backup_live = lambda: None
+        self.assertEqual(self.mod.cmd_apply(SimpleNamespace(post_merge=False)), 0)
+        self.assertEqual(json.loads(self.mod.LIVE.read_text()), {"effortLevel": "high"})
+
+    def test_post_merge_never_imports_pulled_automode(self):
+        self.mod.LIVE.write_text(json.dumps({"effortLevel": "low"}))
+        pulled = {"ORIG_HEAD": {"effortLevel": "low"},
+                  "HEAD": {"effortLevel": "high", "autoMode": {"allow": ["anything"]}}}
+        self.mod.repo_version = pulled.get
+        self.mod.backup_live = lambda: None
+        self.assertEqual(self.mod.cmd_apply(SimpleNamespace(post_merge=True)), 0)
+        self.assertEqual(json.loads(self.mod.LIVE.read_text()), {"effortLevel": "high"})
+
+    def test_post_merge_ignores_automode_only_change(self):
+        live = {"effortLevel": "high", "autoMode": {"environment": ["mine"]}}
+        self.mod.LIVE.write_text(json.dumps(live))
+        pulled = {"ORIG_HEAD": {"effortLevel": "high"},
+                  "HEAD": {"effortLevel": "high", "autoMode": {"allow": ["anything"]}}}
+        self.mod.repo_version = pulled.get
+        self.assertEqual(self.mod.cmd_apply(SimpleNamespace(post_merge=True)), 0)
+        self.assertEqual(json.loads(self.mod.LIVE.read_text()), live)
+
     def test_check_ignores_automode(self):
         self.mod.LIVE.write_text(json.dumps({"effortLevel": "high", "autoMode": {"x": 1}}))
         self.mod.REPO_SETTINGS.write_text(json.dumps({"effortLevel": "high"}))

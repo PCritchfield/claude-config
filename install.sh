@@ -63,12 +63,37 @@ for item in "${MANAGED_ITEMS[@]}"; do
   fi
 done
 
+# Remove links to items this repo no longer holds. stow -R only unstows what is
+# still in the package, so these would dangle forever. Only links that point
+# into this package are touched.
+RETIRED_ITEMS=(CLAUDE.md agents commands)
+for item in "${RETIRED_ITEMS[@]}"; do
+  target_path="$CLAUDE_DIR/$item"
+  if [ -L "$target_path" ]; then
+    case "$(readlink "$target_path")" in
+      *"$STOW_PKG/.claude/$item")
+        echo "Removing retired symlink: $item"
+        rm "$target_path"
+        ;;
+    esac
+  fi
+done
+
 # Ensure target directory exists
 mkdir -p "$CLAUDE_DIR"
 
 # Stow with explicit target of $HOME
 cd "$REPO_DIR"
 stow -t "$TARGET" -R "$STOW_PKG"
+
+# Skills that are neither tracked, ignored, nor in skills.txt are leftovers,
+# e.g. domain skills from before the crew plugin bundled them. They still load,
+# and `git add -A` would publish them, so name them.
+LEFTOVER_SKILLS="$(git -C "$REPO_DIR" ls-files --others --exclude-standard --directory "$STOW_PKG/.claude/skills")"
+if [ -n "$LEFTOVER_SKILLS" ]; then
+  echo "Warning: untracked skills not listed in skills.txt. Remove them, or add them to skills.txt:"
+  printf '  %s\n' $LEFTOVER_SKILLS
+fi
 
 # settings.json: seed from the repo on a fresh machine, or replace a symlink
 # left by an older install. An existing real file is this machine's
