@@ -15,7 +15,7 @@
 
 set -euo pipefail
 
-VAULT="${OBSIDIAN_VAULT:-/Users/philc/Documents/obsidian/Vault}"
+VAULT="${OBSIDIAN_VAULT:?Set OBSIDIAN_VAULT in .claude/settings.json}"
 FALLBACK_LOG="${HOME}/.claude/obsidian-errors.log"
 
 # ── Args ──────────────────────────────────────────────────────────────────────

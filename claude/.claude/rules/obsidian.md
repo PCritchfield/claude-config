@@ -13,7 +13,7 @@ Decisions made, Watch Council agent findings, current task status against SDD ar
 The skill reads the current git branch and derives a label automatically. You will only be asked to confirm if the branch name is ambiguous (`main`, `master`, `develop`, very short names, or no branch detected).
 
 ## Vault Location
-Controlled by the `OBSIDIAN_VAULT` environment variable (set in `.claude/settings.json`). Default: `/Users/philc/Documents/obsidian/Vault`. Summaries are written to `AI Sessions/<project>/<label>/<date>-session.md`.
+Controlled by the `OBSIDIAN_VAULT` environment variable (set in `.claude/settings.json`). No default — the variable must be set. Summaries are written to `AI Sessions/<project>/<label>/<date>-session.md`.
 
 ## Vault Search (Obsidian MCP Server)
 
