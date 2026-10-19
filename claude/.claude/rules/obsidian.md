@@ -3,11 +3,10 @@
 Use the `obsidian-summary` skill to save a structured summary of the current session to the Obsidian vault.
 
 ## When to Save
-- **Manually**: ask Rincewind to save to Obsidian, or run `/obsidian-summary` directly.
-- **At high context**: Rincewind will suggest it at 75%+ context fill. This is a required prompt — context compaction loses decisions and findings worth keeping. Do not skip it. If dismissed once and context continues to fill, raise it again.
+- Ask Rincewind to save to Obsidian, or run `/obsidian-summary` directly.
 
 ## What It Captures
-Decisions made, Watch Council agent findings, current task status against SDD artifacts, and open questions. Not a transcript — a useful reference for the next session.
+Decisions made, crew agent findings and verdicts, task status against the Superpowers spec and plan, and open questions. Not a transcript — a useful reference for the next session.
 
 ## Session Labelling
 The skill reads the current git branch and derives a label automatically. You will only be asked to confirm if the branch name is ambiguous (`main`, `master`, `develop`, very short names, or no branch detected).
@@ -25,9 +24,7 @@ The Obsidian MCP Server provides read access to the vault. Use it to search for 
 - **`obsidian_manage_frontmatter`** — Read frontmatter properties from a specific note.
 
 ### When to Search the Vault
-- **Before proposing architecture changes**: search for prior Granny findings on the same topic.
-- **Before security reviews**: search for prior Angua findings to avoid re-discovering known issues.
-- **Before schema changes**: search for prior Vimes findings on the same tables or migrations.
+- **Before a guardian review**: search for prior `crew:security`, `crew:architecture`, `crew:data`, or `crew:infra` findings on the same topic, so known issues are not rediscovered.
 - **When resuming work on a branch**: search for session notes matching the branch label.
 - **When context about a prior decision is needed**: search for decision notes or session notes mentioning the topic.
 
