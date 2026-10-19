@@ -24,7 +24,7 @@ claude/.claude/
     └── obsidian-summary/
 ```
 
-The files are stored under `claude/.claude/` rather than directly at the repo root so the repository can hold other things (this README, for instance) without polluting the Claude config directory.
+The files are stored under `claude/.claude/`, mirroring their place under `~`, so the repository can hold other things (this README, for instance) alongside them.
 
 ---
 
@@ -32,18 +32,25 @@ The files are stored under `claude/.claude/` rather than directly at the repo ro
 
 Each step is independent. Run what you need.
 
-### Step 1: Stow symlinks
+### Step 1: Copy the files
+
+`~/.claude` holds real files, not links into this repo, so private additions never reach git. Copy what you want:
 
 ```bash
-./install.sh
+cp -a claude/.claude/{rules,hooks,skills,statusline.sh} ~/.claude/
+cp -n claude/.claude/settings.json ~/.claude/settings.json   # only if you have none yet
 ```
 
-Creates symlinks from `~/.claude/` pointing into the repo using [GNU Stow](https://www.gnu.org/software/stow/). Requires `stow`. The script automatically backs up any pre-existing real files before replacing them with symlinks.
+Then set `OBSIDIAN_VAULT` in `~/.claude/settings.json`. When you change something here that should travel, copy it back into this repo by hand.
 
-Machines set up before the crew replaced the council have dangling links for items this repo no longer holds. Remove them once:
+Machines set up with the old stow install have `~/.claude` entries that are symlinks into this repo. Replace each with a real copy, then remove links to items this repo no longer holds:
 
 ```bash
-rm ~/.claude/CLAUDE.md ~/.claude/agents ~/.claude/commands
+cd ~/.claude
+for i in hooks rules settings.json skills statusline.sh; do
+  [ -L "$i" ] && src="$(readlink -f "$i")" && rm "$i" && cp -a "$src" "$i"
+done
+rm -f CLAUDE.md agents commands
 ```
 
 ### Step 2: Plugins
@@ -88,9 +95,11 @@ If you use Obsidian for session notes:
 
 ### Machine-specific settings
 
-Check `settings.json` for local absolute paths and update them:
+These belong only in `~/.claude/settings.json`, never in this repo:
 
-- `OBSIDIAN_VAULT`: set to the vault location on this machine. There is no default; the Obsidian skills fail if it is unset.
+- `OBSIDIAN_VAULT`: the vault location on this machine. The repo copy holds a placeholder; the Obsidian skills fail if it is unset.
+- `autoMode`: the environment description for auto mode's classifier. Claude Code reads it only from `~/.claude/settings.json`, managed settings, or `--settings`, and it describes your own hosts and network.
+- Hooks that other tools install for themselves, such as herdr's.
 
 ---
 
@@ -144,4 +153,4 @@ Contains no secrets. Does contain:
 
 The Obsidian MCP Server configuration (including the API key) lives in `~/.claude.json` at user scope, not in this file. It is machine-specific and not tracked in git.
 
-This repository is public. Keep host names, internal addresses, and other environment details out of `settings.json`.
+This repository is public. The `settings.json` here is the shareable baseline; host names, internal addresses, and other environment details stay in the live copy.
