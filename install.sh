@@ -64,18 +64,20 @@ for item in "${MANAGED_ITEMS[@]}"; do
 done
 
 # Remove links to items this repo no longer holds. stow -R only unstows what is
-# still in the package, so these would dangle forever. Only links that point
-# into this package are touched.
+# still in the package, so these would dangle forever. An item that is back in
+# the package is managed again and left alone; otherwise only a link whose
+# target is this package's copy of the item is removed.
+PKG_DIR="$(cd "$REPO_DIR/$STOW_PKG/.claude" && pwd -P)"
 RETIRED_ITEMS=(CLAUDE.md agents commands)
 for item in "${RETIRED_ITEMS[@]}"; do
   target_path="$CLAUDE_DIR/$item"
-  if [ -L "$target_path" ]; then
-    case "$(readlink "$target_path")" in
-      *"$STOW_PKG/.claude/$item")
-        echo "Removing retired symlink: $item"
-        rm "$target_path"
-        ;;
-    esac
+  [ -e "$PKG_DIR/$item" ] && continue
+  [ -L "$target_path" ] || continue
+  link="$(readlink "$target_path")"
+  link_dir="$(cd "$CLAUDE_DIR" && cd "$(dirname "$link")" 2>/dev/null && pwd -P)" || continue
+  if [ "$link_dir" = "$PKG_DIR" ] && [ "$(basename "$link")" = "$item" ]; then
+    echo "Removing retired symlink: $item"
+    rm "$target_path"
   fi
 done
 
@@ -86,13 +88,13 @@ mkdir -p "$CLAUDE_DIR"
 cd "$REPO_DIR"
 stow -t "$TARGET" -R "$STOW_PKG"
 
-# Skills that are neither tracked, ignored, nor in skills.txt are leftovers,
-# e.g. domain skills from before the crew plugin bundled them. They still load,
-# and `git add -A` would publish them, so name them.
-LEFTOVER_SKILLS="$(git -C "$REPO_DIR" ls-files --others --exclude-standard --directory "$STOW_PKG/.claude/skills")"
+# Skills that are neither tracked nor ignored are leftovers, e.g. domain skills
+# from before the crew plugin bundled them. They still load, and `git add -A`
+# would publish them, so name them. (verify-drift.sh reports these too.)
+LEFTOVER_SKILLS="$(git -C "$REPO_DIR" ls-files --others --exclude-standard --directory "$STOW_PKG/.claude/skills" || true)"
 if [ -n "$LEFTOVER_SKILLS" ]; then
-  echo "Warning: untracked skills not listed in skills.txt. Remove them, or add them to skills.txt:"
-  printf '  %s\n' $LEFTOVER_SKILLS
+  echo "Warning: untracked, unignored skills. Remove them, or list each in skills.txt and .gitignore:"
+  printf '%s\n' "$LEFTOVER_SKILLS" | sed 's/^/  /'
 fi
 
 # settings.json: seed from the repo on a fresh machine, or replace a symlink

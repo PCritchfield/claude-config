@@ -73,6 +73,11 @@ class AutoModeIsAlwaysLocal(unittest.TestCase):
         self.assertEqual(self.mod.cmd_apply(SimpleNamespace(post_merge=True)), 0)
         self.assertEqual(json.loads(self.mod.LIVE.read_text()), live)
 
+    def test_check_ignores_repo_automode(self):
+        self.mod.LIVE.write_text(json.dumps({"effortLevel": "high"}))
+        self.mod.REPO_SETTINGS.write_text(json.dumps({"effortLevel": "high", "autoMode": {"x": 1}}))
+        self.assertEqual(self.mod.cmd_check(None), 0)
+
     def test_check_ignores_automode(self):
         self.mod.LIVE.write_text(json.dumps({"effortLevel": "high", "autoMode": {"x": 1}}))
         self.mod.REPO_SETTINGS.write_text(json.dumps({"effortLevel": "high"}))

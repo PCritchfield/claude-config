@@ -29,8 +29,8 @@ Machine-local keys
   the repo) are machine-local too. None of them sync: capture strips them
   before writing the repo copy, apply ignores the repo's values and carries
   this machine's over so they are never deleted or replaced, check ignores
-  them. Use the exclude file for plugins
-  or settings one machine wants and the shared config should not.
+  them on both sides. Use the exclude file for plugins or settings one machine
+  wants and the shared config should not.
 
 Safety
   capture  Refuses if any env var looks secret. This repo is public; a
@@ -227,8 +227,9 @@ def cmd_apply(args) -> int:
     live = strip_local(raw_live, excludes) if raw_live is not None else None
 
     if args.post_merge:
-        # Strip machine-local keys from the repo side too, so a commit can never
-        # install them on this machine (an autoMode block grants permissions).
+        # Machine-local keys describe this machine, so the repo's copy of them is
+        # ignored on both sides. This is not a trust boundary: a pulled commit
+        # still applies hooks, permissions and plugins. Push access is the boundary.
         before, after = (strip_local(v, excludes) if v is not None else None
                          for v in (repo_version("ORIG_HEAD"), repo_version("HEAD")))
         if after is None or normalize(before) == normalize(after):
@@ -262,8 +263,10 @@ def cmd_apply(args) -> int:
 def cmd_check(_args) -> int:
     if not (LIVE.exists() and REPO_SETTINGS.exists()):
         return 1
-    live = strip_local(load(LIVE), load_excludes())
-    return 0 if normalize(live) == normalize(load(REPO_SETTINGS)) else 1
+    excludes = load_excludes()
+    live = strip_local(load(LIVE), excludes)
+    repo = strip_local(load(REPO_SETTINGS), excludes)
+    return 0 if normalize(live) == normalize(repo) else 1
 
 
 def main() -> int:

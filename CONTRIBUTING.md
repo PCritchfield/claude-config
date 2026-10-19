@@ -2,8 +2,7 @@
 
 This repo is a personal Claude Code configuration. The agents, persona and review
 workflow live in the [crew plugin](https://github.com/PCritchfield/claude-crew);
-this repo holds what surrounds it. Changes are welcome; the bar is that the repo
-must keep practising what it documents.
+this repo holds what surrounds it. Changes are welcome.
 
 ## Read this first: the repo is your live config
 
