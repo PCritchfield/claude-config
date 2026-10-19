@@ -23,8 +23,10 @@ Why this exists
   permission rules on 2026-09-23.
 
 Machine-local keys
-  Paths listed in ~/.claude/sync-settings.exclude (outside the repo) never
-  sync: capture strips them before writing the repo copy, apply carries this
+  autoMode is always machine-local: it describes this machine's hosts and
+  network for auto mode's classifier, and Claude Code reads it only from the
+  user settings file. Paths listed in ~/.claude/sync-settings.exclude (outside
+  the repo) are machine-local too. None of them sync: capture strips them before writing the repo copy, apply carries this
   machine's values over so they are never deleted, check ignores them. Use it
   for plugins or settings one machine wants and the shared config should not.
 
@@ -61,6 +63,9 @@ LIVE = Path.home() / ".claude" / "settings.json"
 BACKUPS = Path.home() / ".claude" / "backups"
 EXCLUDE = Path.home() / ".claude" / "sync-settings.exclude"
 
+# Never synced, on any machine. See "Machine-local keys" above.
+ALWAYS_LOCAL = [("autoMode",)]
+
 SECRET_NAME = re.compile(
     r"token|secret|passw(or)?d|credential|api[_-]?key|private[_-]?key|access[_-]?key",
     re.I,
@@ -77,16 +82,16 @@ def load(path: Path):
 
 
 def load_excludes() -> list[tuple[str, ...]]:
-    """Machine-local keys that never sync, from ~/.claude/sync-settings.exclude.
+    """Machine-local keys that never sync: ALWAYS_LOCAL, plus ~/.claude/sync-settings.exclude.
 
     One path per line, segments separated by '/', e.g.
         enabledPlugins/vercel@claude-plugins-official
     '/' rather than '.' because plugin and marketplace names can contain dots.
     The file lives outside the repo on purpose: it is this machine's business.
     """
+    paths = list(ALWAYS_LOCAL)
     if not EXCLUDE.exists():
-        return []
-    paths = []
+        return paths
     for line in EXCLUDE.read_text().splitlines():
         line = line.strip()
         if line and not line.startswith("#"):
