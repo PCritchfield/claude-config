@@ -24,13 +24,6 @@ SOFTWARE.
 
 Third-party content
 
-The over-engineering-audit skill adapts its review lens and tag taxonomy from
-ponytail (https://github.com/DietrichGebert/ponytail), MIT licensed. Prompt
-content was adapted; no machinery was copied.
-
 Community skills listed in skills.txt are fetched from their upstream
 repositories at install time and are not redistributed here. Each retains its
 own licence. See skills.txt for the source of each.
-
-SDD slash commands are generated at setup time by slash-man from
-liatrio-labs/spec-driven-workflow and are not committed to this repository.

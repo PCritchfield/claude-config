@@ -26,6 +26,9 @@ jobs:
       - name: Validate agent and settings configuration
         run: python3 scripts/validate-config.py
 
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests
+
   shell:
     name: shell
     runs-on: ubuntu-latest

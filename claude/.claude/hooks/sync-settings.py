@@ -23,10 +23,14 @@ Why this exists
   permission rules on 2026-09-23.
 
 Machine-local keys
-  Paths listed in ~/.claude/sync-settings.exclude (outside the repo) never
-  sync: capture strips them before writing the repo copy, apply carries this
-  machine's values over so they are never deleted, check ignores them. Use it
-  for plugins or settings one machine wants and the shared config should not.
+  autoMode is always machine-local: it describes this machine's hosts and
+  network for auto mode's classifier, and Claude Code reads it only from the
+  user settings file. Paths listed in ~/.claude/sync-settings.exclude (outside
+  the repo) are machine-local too. None of them sync: capture strips them
+  before writing the repo copy, apply ignores the repo's values and carries
+  this machine's over so they are never deleted or replaced, check ignores
+  them on both sides. Use the exclude file for plugins or settings one machine
+  wants and the shared config should not.
 
 Safety
   capture  Refuses if any env var looks secret. This repo is public; a
@@ -61,6 +65,9 @@ LIVE = Path.home() / ".claude" / "settings.json"
 BACKUPS = Path.home() / ".claude" / "backups"
 EXCLUDE = Path.home() / ".claude" / "sync-settings.exclude"
 
+# Never synced, on any machine. See "Machine-local keys" above.
+ALWAYS_LOCAL = [("autoMode",)]
+
 SECRET_NAME = re.compile(
     r"token|secret|passw(or)?d|credential|api[_-]?key|private[_-]?key|access[_-]?key",
     re.I,
@@ -77,16 +84,16 @@ def load(path: Path):
 
 
 def load_excludes() -> list[tuple[str, ...]]:
-    """Machine-local keys that never sync, from ~/.claude/sync-settings.exclude.
+    """Machine-local keys that never sync: ALWAYS_LOCAL, plus ~/.claude/sync-settings.exclude.
 
     One path per line, segments separated by '/', e.g.
         enabledPlugins/vercel@claude-plugins-official
     '/' rather than '.' because plugin and marketplace names can contain dots.
     The file lives outside the repo on purpose: it is this machine's business.
     """
+    paths = list(ALWAYS_LOCAL)
     if not EXCLUDE.exists():
-        return []
-    paths = []
+        return paths
     for line in EXCLUDE.read_text().splitlines():
         line = line.strip()
         if line and not line.startswith("#"):
@@ -220,7 +227,11 @@ def cmd_apply(args) -> int:
     live = strip_local(raw_live, excludes) if raw_live is not None else None
 
     if args.post_merge:
-        before, after = repo_version("ORIG_HEAD"), repo_version("HEAD")
+        # Machine-local keys describe this machine, so the repo's copy of them is
+        # ignored on both sides. This is not a trust boundary: a pulled commit
+        # still applies hooks, permissions and plugins. Push access is the boundary.
+        before, after = (strip_local(v, excludes) if v is not None else None
+                         for v in (repo_version("ORIG_HEAD"), repo_version("HEAD")))
         if after is None or normalize(before) == normalize(after):
             return 0
         if live is not None and normalize(live) == normalize(after):
@@ -236,7 +247,7 @@ def cmd_apply(args) -> int:
         if not REPO_SETTINGS.exists():
             print(f"sync-settings: no {REPO_REL} in the repo", file=sys.stderr)
             return 1
-        target = load(REPO_SETTINGS)
+        target = strip_local(load(REPO_SETTINGS), excludes)
         if live is not None and normalize(live) == normalize(target):
             return 0
 
@@ -252,8 +263,10 @@ def cmd_apply(args) -> int:
 def cmd_check(_args) -> int:
     if not (LIVE.exists() and REPO_SETTINGS.exists()):
         return 1
-    live = strip_local(load(LIVE), load_excludes())
-    return 0 if normalize(live) == normalize(load(REPO_SETTINGS)) else 1
+    excludes = load_excludes()
+    live = strip_local(load(LIVE), excludes)
+    repo = strip_local(load(REPO_SETTINGS), excludes)
+    return 0 if normalize(live) == normalize(repo) else 1
 
 
 def main() -> int:

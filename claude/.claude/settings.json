@@ -4,7 +4,7 @@
   "autoDreamEnabled": true,
   "autoMemoryEnabled": true,
   "enabledPlugins": {
-    "claude-workflow@claude-workflow": true,
+    "crew@crew": true,
     "superpowers@claude-plugins-official": true
   },
   "env": {
@@ -12,10 +12,10 @@
     "OBSIDIAN_VAULT": "/Users/philc/Documents/obsidian/Vault"
   },
   "extraKnownMarketplaces": {
-    "claude-workflow": {
+    "crew": {
       "source": {
-        "source": "git",
-        "url": "https://github.com/liatrio-labs/claude-workflow.git"
+        "repo": "PCritchfield/claude-crew",
+        "source": "github"
       }
     }
   },

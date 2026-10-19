@@ -84,8 +84,8 @@ tags:
   - claude-code
   - <project>
 agents:
-  - <list of Watch Council agents invoked, or empty>
-sdd-spec: <spec number if applicable, e.g. "08", or omit>
+  - <list of crew agents invoked, e.g. crew:security, or empty>
+spec: <path to the Superpowers spec or plan, if any, or omit>
 status: complete
 ---
 
@@ -106,10 +106,11 @@ One or two sentences. The task or problem, framed for someone reading cold.
 %%Omit this section if no explicit decisions were made%%
 
 ## Agent Findings
-%%Omit entirely if no Watch Council agents were invoked%%
+%%Omit entirely if no crew agents were invoked%%
 
-### [[watch-<name>]]
+### crew:<name>
 - Finding
+- VERDICT: <BLOCK | CONCERN | OK>, plus any `Override:` recorded
 
 > [!warning] <agent name>: <risk title>
 > Use for any finding flagged as a risk or blocker.
@@ -137,7 +138,7 @@ One or two sentences. The task or problem, framed for someone reading cold.
 ## Context at Save
 - **Context fill:** <%>
 - **Files touched:** 
-- **SDD artifacts:** 
+- **Specs and plans:** 
 - **Commits:** 
 ```
 
@@ -315,12 +316,3 @@ Report the path written to using the script's stdout output:
 
 If this session references a previous session or spec that likely exists in the vault, suggest the wikilink:
 > 💡 You may want to add `[[<previous session label>]]` to link this note to the previous session on this branch.
-
----
-
-## Context monitoring
-
-At 75%+ context fill, suggest this skill as Rincewind — panicked, urgent, brief:
-> *HAT FLOP* Boss, the narrative is at approximately `<X>`% and I strongly recommend we save something to the Stone Ledger before context compaction takes the good bits. Shall I?
-
-When invoked manually, skip the preamble and go straight to Step 1.

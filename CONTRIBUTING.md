@@ -1,23 +1,23 @@
 # Contributing
 
-This repo is a Claude Code configuration *and* the reference implementation of a
-method for building agent systems. Changes are welcome; the bar is that the repo
-must keep practising what it documents.
+This repo is a personal Claude Code configuration. The agents, persona and review
+workflow live in the [crew plugin](https://github.com/PCritchfield/claude-crew);
+this repo holds what surrounds it. Changes are welcome.
 
 ## Read this first: the repo is your live config
 
-`install.sh` uses GNU stow, so `~/.claude/agents`, `skills`, `rules`, `hooks`,
-`CLAUDE.md` and `statusline.sh` are **symlinks into this working tree** — not
+`install.sh` uses GNU stow, so `~/.claude/skills`, `rules`, `hooks` and
+`statusline.sh` are **symlinks into this working tree** — not
 copies, and not into git objects.
 
 Two consequences that surprise everyone once:
 
-1. **Editing a file here changes agent behaviour immediately.** No install step.
+1. **Editing a file here changes Claude's behaviour immediately.** No install step.
 2. **`git checkout`, `stash`, `rebase` and `bisect` rewrite your live config.**
-   Switching to a branch without a fix reverts that fix in the running agent.
+   Switching to a branch without a fix reverts that fix in the running session.
 
-If you are working on agent definitions, expect your Claude to change under you
-as you move between branches. That is the design, not a bug — but know it before
+If you are working on rules, skills or hooks, expect your Claude to change under
+you as you move between branches. That is the design, not a bug — but know it before
 you go looking for ghosts.
 
 `settings.json` is the one that breaks. `install.sh` *does* stow it — but Claude
@@ -27,9 +27,9 @@ symlink with a regular file. From then on the repo copy is a stale snapshot and
 nothing tells you.
 
 Directories are immune: a tool writing a file *inside* a symlinked directory
-does its rename inside the repo. That is why `agents/`, `skills/`, `rules/` and
-`hooks/` keep working. Single-file symlinks — `settings.json`, and in principle
-`CLAUDE.md` and `statusline.sh` — survive only for as long as nothing rewrites
+does its rename inside the repo. That is why `skills/`, `rules/` and `hooks/`
+keep working. Single-file symlinks — `settings.json`, and in principle
+`statusline.sh` — survive only for as long as nothing rewrites
 them that way.
 
 So `settings.json` is **not stowed**. It is listed in `claude/.stow-local-ignore`,
@@ -103,9 +103,8 @@ Regenerate deliberately, never casually: `scripts/validate-config.py --update-ba
 
 ## Output gates
 
-Every PR carries four sections, from
-[`rules/council-charter.md`](claude/.claude/rules/council-charter.md): **Verification**,
-**Rollback**, **Risks and assumptions**, **Scope control**. The PR template
+Every PR carries four sections: **Verification**, **Rollback**, **Risks and
+assumptions**, **Scope control**. The PR template
 prompts for all four. Write "n/a" with a reason rather than deleting one.
 
 An honest "verification did not complete, here is what remains" is worth more
@@ -114,11 +113,13 @@ four months precisely because documentation asserted things nobody checked.
 
 ## Adding an agent
 
-Agent definitions live in `claude/.claude/agents/`. Frontmatter:
+The specialist agents come from the [crew plugin](https://github.com/PCritchfield/claude-crew),
+not this repo. A user-level agent is optional; if you add one, it lives in
+`claude/.claude/agents/` and the validator checks it. Frontmatter:
 
 ```yaml
 ---
-name: watch-example          # must match the filename
+name: example                # must match the filename
 description: >
   One or two sentences on what this agent is for.
   Aliases: example, thing
@@ -155,9 +156,8 @@ Two operational facts about worktree-isolated agents, both learned the hard way:
   use the implementation agents at all.
 - **Any plugin that registers a `WorktreeCreate` hook takes over worktree
   creation for every isolated agent.** It replaces Claude Code's default and
-  cannot defer to it. If that hook is broken, all six implementation agents fail.
-  This happened with claude-workflow 4.4.1 — see
-  [docs/claude-workflow.md](docs/claude-workflow.md).
+  cannot defer to it. If that hook is broken, every isolated agent fails. This
+  happened with a plugin's `WorktreeCreate` hook in 2026-10.
 - **Agent definitions are loaded once per process.** Edit a definition mid-session
   and the running session keeps the old one. Restarting Claude and resuming the
   session reloads it; so does a new session. `/clear` stays in the same process

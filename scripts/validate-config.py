@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Validate the Watch Council configuration as data.
+"""Validate user-level agent, skill and settings configuration as data.
+
+Written for the Watch Council, since replaced by the crew plugin. Agent checks
+run only if claude/.claude/agents/ exists.
 
 Both defects found in the 2026-09 audit were statically detectable from this
 repo alone, and both survived four months because nothing asserted anything:
@@ -200,8 +203,8 @@ def split_tools(value) -> list[str]:
 
 
 def check_agents(report: Report, skills: set[str]) -> None:
+    # User-level agents are optional: the crew plugin ships its own.
     if not AGENTS_DIR.is_dir():
-        report.error("agents", f"no agents directory at {AGENTS_DIR}")
         return
 
     for path in sorted(AGENTS_DIR.glob("*.md")):
@@ -386,7 +389,9 @@ def main() -> int:
     reproduced = {k for k, _ in report.errors}
     fixed = sorted(baseline - reproduced)
 
-    print(f"agents: {len(sorted(AGENTS_DIR.glob('*.md')))}  "
+    agents = (len(list(AGENTS_DIR.glob('*.md'))) if AGENTS_DIR.is_dir()
+              else "none (checks skipped; the crew plugin supplies agents)")
+    print(f"agents: {agents}  "
           f"skills known: {len(skills)}\n")
 
     for key, message in hard:

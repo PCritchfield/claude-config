@@ -63,12 +63,39 @@ for item in "${MANAGED_ITEMS[@]}"; do
   fi
 done
 
+# Remove links to items this repo no longer holds. stow -R only unstows what is
+# still in the package, so these would dangle forever. An item that is back in
+# the package is managed again and left alone; otherwise only a link whose
+# target is this package's copy of the item is removed.
+PKG_DIR="$(cd "$REPO_DIR/$STOW_PKG/.claude" && pwd -P)"
+RETIRED_ITEMS=(CLAUDE.md agents commands)
+for item in "${RETIRED_ITEMS[@]}"; do
+  target_path="$CLAUDE_DIR/$item"
+  [ -e "$PKG_DIR/$item" ] && continue
+  [ -L "$target_path" ] || continue
+  link="$(readlink "$target_path")"
+  link_dir="$(cd "$CLAUDE_DIR" && cd "$(dirname "$link")" 2>/dev/null && pwd -P)" || continue
+  if [ "$link_dir" = "$PKG_DIR" ] && [ "$(basename "$link")" = "$item" ]; then
+    echo "Removing retired symlink: $item"
+    rm "$target_path"
+  fi
+done
+
 # Ensure target directory exists
 mkdir -p "$CLAUDE_DIR"
 
 # Stow with explicit target of $HOME
 cd "$REPO_DIR"
 stow -t "$TARGET" -R "$STOW_PKG"
+
+# Skills that are neither tracked nor ignored are leftovers, e.g. domain skills
+# from before the crew plugin bundled them. They still load, and `git add -A`
+# would publish them, so name them. (verify-drift.sh reports these too.)
+LEFTOVER_SKILLS="$(git -C "$REPO_DIR" ls-files --others --exclude-standard --directory "$STOW_PKG/.claude/skills" || true)"
+if [ -n "$LEFTOVER_SKILLS" ]; then
+  echo "Warning: untracked, unignored skills. Remove them, or list each in skills.txt and .gitignore:"
+  printf '%s\n' "$LEFTOVER_SKILLS" | sed 's/^/  /'
+fi
 
 # settings.json: seed from the repo on a fresh machine, or replace a symlink
 # left by an older install. An existing real file is this machine's
@@ -85,11 +112,6 @@ fi
 # Git hooks: post-merge carries settings.json changes pulled from another
 # machine into ~/.claude. Guarded — see sync-settings.py.
 git -C "$REPO_DIR" config core.hooksPath .githooks
-
-# Local plugin patches. Plugin updates overwrite the plugin cache, so these are
-# re-applied here. Non-fatal: a missing plugin is fine, and a version the patch
-# was not written for is reported, not guessed at. See docs/claude-workflow.md.
-"$REPO_DIR/scripts/apply-local-patches.sh" || echo "  (see docs/claude-workflow.md)"
 
 echo ""
 echo "Done. Managed items in ~/.claude are now symlinked from this repo."
