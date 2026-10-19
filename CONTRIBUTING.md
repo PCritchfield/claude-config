@@ -103,9 +103,8 @@ Regenerate deliberately, never casually: `scripts/validate-config.py --update-ba
 
 ## Output gates
 
-Every PR carries four sections, from
-[`rules/council-charter.md`](claude/.claude/rules/council-charter.md): **Verification**,
-**Rollback**, **Risks and assumptions**, **Scope control**. The PR template
+Every PR carries four sections: **Verification**, **Rollback**, **Risks and
+assumptions**, **Scope control**. The PR template
 prompts for all four. Write "n/a" with a reason rather than deleting one.
 
 An honest "verification did not complete, here is what remains" is worth more
@@ -114,11 +113,13 @@ four months precisely because documentation asserted things nobody checked.
 
 ## Adding an agent
 
-Agent definitions live in `claude/.claude/agents/`. Frontmatter:
+The specialist agents come from the [crew plugin](https://github.com/PCritchfield/claude-crew),
+not this repo. A user-level agent is optional; if you add one, it lives in
+`claude/.claude/agents/` and the validator checks it. Frontmatter:
 
 ```yaml
 ---
-name: watch-example          # must match the filename
+name: example                # must match the filename
 description: >
   One or two sentences on what this agent is for.
   Aliases: example, thing
@@ -155,9 +156,8 @@ Two operational facts about worktree-isolated agents, both learned the hard way:
   use the implementation agents at all.
 - **Any plugin that registers a `WorktreeCreate` hook takes over worktree
   creation for every isolated agent.** It replaces Claude Code's default and
-  cannot defer to it. If that hook is broken, all six implementation agents fail.
-  This happened with claude-workflow 4.4.1 — see
-  [docs/claude-workflow.md](docs/claude-workflow.md).
+  cannot defer to it. If that hook is broken, every isolated agent fails. This
+  happened with a plugin's `WorktreeCreate` hook in 2026-10.
 - **Agent definitions are loaded once per process.** Edit a definition mid-session
   and the running session keeps the old one. Restarting Claude and resuming the
   session reloads it; so does a new session. `/clear` stays in the same process

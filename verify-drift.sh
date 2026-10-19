@@ -225,24 +225,6 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 5. Local plugin patches
-#
-# A plugin update silently replaces a patched file in the plugin cache. For
-# claude-workflow that means every worktree-isolated agent starts failing.
-# ---------------------------------------------------------------------------
-head_ "Local plugin patches"
-PATCHER="$REPO_DIR/scripts/apply-local-patches.sh"
-if [ -x "$PATCHER" ]; then
-  patch_out="$("$PATCHER" --check 2>&1)"; patch_rc=$?
-  printf '%s\n' "$patch_out" | tail -n +2 | sed 's/^  /  /'
-  if [ "$patch_rc" -ne 0 ]; then
-    bad "a plugin is missing its local patch — run scripts/apply-local-patches.sh"
-  fi
-else
-  printf '  %sno patch script%s\n' "$D" "$Z"
-fi
-
-# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo
