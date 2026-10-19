@@ -26,9 +26,10 @@ Machine-local keys
   autoMode is always machine-local: it describes this machine's hosts and
   network for auto mode's classifier, and Claude Code reads it only from the
   user settings file. Paths listed in ~/.claude/sync-settings.exclude (outside
-  the repo) are machine-local too. None of them sync: capture strips them before writing the repo copy, apply carries this
-  machine's values over so they are never deleted, check ignores them. Use it
-  for plugins or settings one machine wants and the shared config should not.
+  the repo) are machine-local too. None of them sync: capture strips them
+  before writing the repo copy, apply carries this machine's values over so
+  they are never deleted, check ignores them. Use the exclude file for plugins
+  or settings one machine wants and the shared config should not.
 
 Safety
   capture  Refuses if any env var looks secret. This repo is public; a

@@ -5,6 +5,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "claude" / ".claude" / "hooks" / "sync-settings.py"
@@ -23,7 +24,9 @@ class AutoModeIsAlwaysLocal(unittest.TestCase):
 
     def setUp(self):
         self.mod = load_module()
-        self.tmp = Path(tempfile.mkdtemp())
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = Path(tmp.name)
         self.mod.EXCLUDE = self.tmp / "no-such-exclude-file"
         self.mod.LIVE = self.tmp / "live.json"
         self.mod.REPO_SETTINGS = self.tmp / "repo.json"
@@ -40,11 +43,7 @@ class AutoModeIsAlwaysLocal(unittest.TestCase):
                                              "autoMode": {"environment": ["mine"]}}))
         self.mod.REPO_SETTINGS.write_text(json.dumps({"effortLevel": "high"}))
         self.mod.backup_live = lambda: None
-
-        class Args:
-            post_merge = False
-
-        self.assertEqual(self.mod.cmd_apply(Args()), 0)
+        self.assertEqual(self.mod.cmd_apply(SimpleNamespace(post_merge=False)), 0)
         self.assertEqual(json.loads(self.mod.LIVE.read_text()),
                          {"effortLevel": "high", "autoMode": {"environment": ["mine"]}})
 
